@@ -18,6 +18,7 @@ export default function Home() {
   const router = useRouter();
 
   const onSubmit = (data: FormData) => {
+    console.log('Form submitted:', data);
     dispatch(setFormData(data));
     router.push('/results');
   };
@@ -71,6 +72,15 @@ export default function Home() {
             Submit
           </Button>
         </form>
+        {/* <Button
+          variant="outlined"
+          color="primary"
+          fullWidth
+          sx={{ mt: 2 }}
+          onClick={() => router.push('/settings')}
+        >
+          Cancel
+        </Button> */}
       </Box>
     </Container>
   );
