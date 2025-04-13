@@ -1,26 +1,31 @@
-import { contextBridge, ipcRenderer, safeStorage } from 'electron';
+import { contextBridge, ipcRenderer } from 'electron';
+
+import { AWSCredentialsFormData } from '../src/types/awsCredentialsForm';
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  clearStore: () => {
+    ipcRenderer.send('clear-store');
+  },
+  setTitle: (title: string) => {
+    ipcRenderer.send('set-title', title);
+  },
   loadPage: (path: string) => {
     alert('loadPage called');
     ipcRenderer.send('load-page', path);
   },
-  isEncryptionAvailable: () => safeStorage.isEncryptionAvailable(),
+  getAWSCredentials: async () => {
+    return await ipcRenderer.invoke('store-get-aws-credentials') as AWSCredentialsFormData | undefined;
+  },
+  setAWSCredentials: async (data: AWSCredentialsFormData) => {
+    await ipcRenderer.invoke('store-set-aws-credentials', data);
+  },
   encryptString: async (plainText: string) => {
-    if (safeStorage.isEncryptionAvailable()) {
-      return safeStorage.encryptString(plainText).toString('base64');
-    }
-    return null;
+    const encrypted = await ipcRenderer.invoke('encrypt-string', plainText);
+    console.log('Encrypted:', encrypted);
+    return encrypted;
   },
   decryptString: async (encryptedBase64: string) => {
-    if (safeStorage.isEncryptionAvailable() && encryptedBase64) {
-      try {
-        return safeStorage.decryptString(Buffer.from(encryptedBase64, 'base64')).toString();
-      } catch (error) {
-        console.error('Decryption error:', error);
-        return null;
-      }
-    }
-    return null;
+    const decrypted = await ipcRenderer.invoke('decrypt-string', encryptedBase64);
+    return decrypted;
   },  
 });

@@ -3,7 +3,7 @@
 import { useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { Container, Box, Typography, Paper, Button } from '@mui/material';
-import { RootState } from '@/store/store';
+import { RootState } from '@/store/reduxStore';
 
 export default function Results() {
   const formData = useSelector((state: RootState) => state.form);

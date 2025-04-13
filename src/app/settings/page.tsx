@@ -1,14 +1,14 @@
 'use client';
 
 import { Box, Button, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
 import { TextField } from '@mui/material';
-import { useElectronRouter } from '@/utils/navigation';
-import { setFormData } from '@/store/awsCredentialsFormSlice';
+import { useElectronRouter } from '@/utils/useElectronRouter';
 import { AWSCredentialsFormData } from '@/types/awsCredentialsForm';
-
-
+import { useForm } from 'react-hook-form';
+import { usePageTitle } from '@/utils/usePageTitle';
+import { useDispatch } from 'react-redux';
+import { setFormData } from '@/store/awsCredentialsFormSlice';
 
 declare global {
   interface Window {
@@ -16,7 +16,9 @@ declare global {
       loadPage: (path: string) => void;
       encryptString: (plainText: string) => Promise<string | null>;
       decryptString: (encryptedBase64: string) => Promise<string | null>;
-      isEncryptionAvailable: () => boolean;
+      getAWSCredentials: () => Promise<AWSCredentialsFormData | undefined>;
+      setAWSCredentials: (data: AWSCredentialsFormData) => Promise<void>;
+      setTitle: (title: string) => void;
     };
   }
 }
@@ -49,13 +51,13 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function SettingsPage() {
+  usePageTitle('Settings ');
   const [value, setValue] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
   const dispatch = useDispatch();
-
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    console.log("handleChange called")
-    setValue(newValue);
-  };
+  
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<AWSCredentialsFormData>({
+  });
 
   const electronRouter = useElectronRouter();
 
@@ -63,10 +65,39 @@ export default function SettingsPage() {
     electronRouter.navigate('/');
   };
 
-  const onAwsCredentialsFormSubmit = (data: AWSCredentialsFormData) => {
-    console.log('Form submitted:', data);
-    dispatch(setFormData(data));
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setValue(newValue);
   };
+
+  useEffect(() => {
+    const loadStoredData = async () => {
+      setIsLoading(true);
+      try {
+        if (window.electronAPI) {
+          const storedData = await window.electronAPI.getAWSCredentials();
+          if (storedData) {
+            const decryptedString = storedData.secretKey ? 
+              await window.electronAPI.decryptString(storedData.secretKey) : '';
+            
+            // dispatch(setFormData({
+            //   ...storedData,
+            //   secretKey: decryptedString || ''
+            // }));
+            
+            reset({
+              ...storedData,
+              secretKey: decryptedString || ''
+            });
+          }
+        }
+      } catch (error) {
+        console.error('Error loading stored data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadStoredData();
+  }, [reset]);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -75,71 +106,74 @@ export default function SettingsPage() {
           orientation="vertical"
           variant="scrollable"
           value={value}
-          onChange={handleChange}
+          onChange={handleTabChange}
           sx={{ borderRight: 1, borderColor: 'divider', minWidth: 200 }}
         >
-          <Tab label="AWS Config" />
+          <Tab label="AWS Credentials" />
           <Tab label="Appearance" />
           <Tab label="Advanced" />
         </Tabs>
 
         <TabPanel value={value} index={0}>
           <Typography variant="h6" gutterBottom>
-            AWS Config
+            AWS Credentials
           </Typography>
+          {isLoading ? (
+            <Typography>Loading...</Typography>
+          ) : (
           <Box>
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              const formData = new FormData(e.target as HTMLFormElement);
-              const accountId = formData.get('accountId');
-              const keyId = formData.get('keyId');
-              const secretKey = formData.get('secretKey');
-
-              const accountIdValidate = /^[0-9]+$/;
-              const keyIdValidate = /^[a-zA-Z0-9]+$/;
-              const secretKeyValidate = /^[a-zA-Z0-9]+$/;
-
-              if (!accountIdValidate.test(accountId as string)) {
-                alert('Account ID must be numeric');
-                return;
+            {/* Using react-hook-form */}
+            <form onSubmit={handleSubmit(async (data) => {
+              const encryptedSecretKey = await window.electronAPI?.encryptString(data.secretKey);
+              if (encryptedSecretKey && window.electronAPI) {
+                const formData: AWSCredentialsFormData = {
+                  accountId: data.accountId,
+                  keyId: data.keyId,
+                  secretKey: encryptedSecretKey,
+                };
+                await window.electronAPI.setAWSCredentials(formData);
+                dispatch(setFormData(formData));
+                electronRouter.navigate('/');
               }
-              if (!keyIdValidate.test(keyId as string)) {
-                alert('Key ID must be alphanumeric');
-                return;
-              }
-              if (!secretKeyValidate.test(secretKey as string)) {
-                alert('Secret Key must be alphanumeric');
-                return;
-              }
-
-              (async () => {
-                const encryptedSecretKey = await window.electronAPI?.encryptString(secretKey as string);
-                if (encryptedSecretKey) {
-                  dispatch(setFormData({
-                    accountId,
-                    keyId,
-                    secretKey: encryptedSecretKey,
-                  }));
-                }
-              })();
-            }}>
+            })}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 <TextField
+                  {...register('accountId', {
+                    required: 'Account ID is required',
+                    pattern: {
+                      value: /^[0-9]+$/,
+                      message: 'Account ID must be numeric'
+                    }
+                  })}
                   label="Account ID"
-                  name="accountId"
                   type="number"
-                  required
+                  error={!!errors.accountId}
+                  helperText={errors.accountId?.message}
                 />
                 <TextField
+                  {...register('keyId', {
+                    required: 'Key ID is required',
+                    pattern: {
+                      value: /^[a-zA-Z0-9]+$/,
+                      message: 'Key ID must be alphanumeric'
+                    }
+                  })}
                   label="Key ID"
-                  name="keyId"
-                  required
+                  error={!!errors.keyId}
+                  helperText={errors.keyId?.message}
                 />
                 <TextField
+                  {...register('secretKey', {
+                    required: 'Secret Key is required',
+                    pattern: {
+                      value: /^[a-zA-Z0-9]+$/,
+                      message: 'Secret Key must be alphanumeric'
+                    }
+                  })}
                   label="Secret Key"
-                  name="secretKey"
                   type="password"
-                  required
+                  error={!!errors.secretKey}
+                  helperText={errors.secretKey?.message}
                 />
               </Box>
               <Button
@@ -151,15 +185,8 @@ export default function SettingsPage() {
                 Save Changes
               </Button>
             </form>
-
-            <Button
-              variant="contained"
-              color="primary"
-              sx={{ float: 'right', marginTop: 20}}
-            >
-              Save Changes
-            </Button>
           </Box>
+          )}
         </TabPanel>
         <TabPanel value={value} index={1}>
           <Typography variant="h6" gutterBottom>
@@ -184,7 +211,7 @@ export default function SettingsPage() {
           }}
           sx={{ marginTop: 5, float: 'right', marginRight: 1 }}
         >
-          Exit
+          Done
         </Button>
       </Box>
 

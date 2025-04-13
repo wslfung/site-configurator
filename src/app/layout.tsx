@@ -16,9 +16,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <title>Site Configurator</title>
-      </head>
       <body
         className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}
       >

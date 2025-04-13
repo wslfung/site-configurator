@@ -1,4 +1,4 @@
-export interface FormData {
+export interface LambdaFormData {
   region: string;
   name: string;
   version: string;
