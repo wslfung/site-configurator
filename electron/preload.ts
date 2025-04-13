@@ -10,7 +10,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send('set-title', title);
   },
   loadPage: (path: string) => {
-    alert('loadPage called');
     ipcRenderer.send('load-page', path);
   },
   getAWSCredentials: async () => {

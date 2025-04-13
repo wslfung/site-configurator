@@ -1,14 +1,16 @@
 'use client';
 
-import { Box, Button, Container, Paper, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Container, Tab, Tabs, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { TextField } from '@mui/material';
+import { useTheme, TextField } from '@mui/material';
 import { useElectronRouter } from '@/utils/useElectronRouter';
 import { AWSCredentialsFormData } from '@/types/awsCredentialsForm';
 import { useForm } from 'react-hook-form';
 import { usePageTitle } from '@/utils/usePageTitle';
 import { useDispatch } from 'react-redux';
 import { setFormData } from '@/store/awsCredentialsFormSlice';
+import './settings.css';
+
 
 declare global {
   interface Window {
@@ -51,6 +53,7 @@ function TabPanel(props: TabPanelProps) {
 }
 
 export default function SettingsPage() {
+  const theme = useTheme();
   usePageTitle('Settings ');
   const [value, setValue] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -101,7 +104,8 @@ export default function SettingsPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Paper sx={{ display: 'flex', minHeight: '70vh' }}>
+      <Box className="gear-background" />
+      <Box sx={{ display: 'flex', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
         <Tabs
           orientation="vertical"
           variant="scrollable"
@@ -200,7 +204,7 @@ export default function SettingsPage() {
           </Typography>
           {/* Add your form fields here */}
         </TabPanel>
-      </Paper>
+      </Box>
       <Box>
         <Button
           variant="contained"
@@ -214,7 +218,6 @@ export default function SettingsPage() {
           Done
         </Button>
       </Box>
-
     </Container>
   );
 }

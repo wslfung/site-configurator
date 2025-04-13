@@ -1,0 +1,13 @@
+.gear-background {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-image: url('/gear.svg');
+  background-size: 70%;
+  background-position-x: -50%;
+  background-position-y: 140%;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  z-index: -1;
+  
+}
