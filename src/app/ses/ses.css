@@ -1,0 +1,13 @@
+.ses-background {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-image: url('/aws-ses.svg');
+  background-size: 50%;
+  background-position-x: -10%;
+  background-position-y: 120%;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  z-index: -1;
+  
+}

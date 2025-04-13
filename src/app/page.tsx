@@ -24,7 +24,7 @@ export default function Home() {
             type="button"
             fullWidth
             sx={{ mt: 5}}
-            onClick={() => electronRouter.navigate('/results')}
+            onClick={() => electronRouter.navigate('/ses')}
           >
             <Typography fontFamily={codystar.style.fontFamily} sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>SES Email Templates</Typography>
           </CustomButton>
@@ -33,7 +33,7 @@ export default function Home() {
             type="button"
             fullWidth
             sx={{ mt: 3, textAlign: 'left' }}
-            onClick={() => electronRouter.navigate('/results')}
+            onClick={() => electronRouter.navigate('/lambda')}
           >
             <Typography fontFamily={codystar.style.fontFamily} sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>AWS Lambda Deployment</Typography>
           </CustomButton>
