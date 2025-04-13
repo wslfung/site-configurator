@@ -12,6 +12,10 @@
     "electron-build": "next build && tsc -p electron/tsconfig.json && electron-builder"
   },
   "dependencies": {
+    "@aws-sdk/client-codeartifact": "^3.787.0",
+    "@aws-sdk/client-eventbridge": "^3.787.0",
+    "@aws-sdk/client-lambda": "^3.787.0",
+    "@aws-sdk/client-ses": "^3.787.0",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
     "@mui/material": "^7.0.2",
