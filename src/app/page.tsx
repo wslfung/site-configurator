@@ -24,7 +24,8 @@ export default function Home() {
   };
 
   return (
-    <Container maxWidth="sm">
+    <>
+      <Container maxWidth="sm">
       <Box sx={{ mt: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Enter Details
@@ -83,5 +84,24 @@ export default function Home() {
         </Button> */}
       </Box>
     </Container>
+      <Box
+        sx={{
+          position: 'fixed',
+          bottom: 20,
+          right: 20,
+          opacity: 0.25,
+          pointerEvents: 'none',
+          zIndex: -1
+        }}
+      >
+        <Image
+          src="/gear.svg"
+          alt="Settings"
+          width={500}
+          height={500}
+          priority
+        />
+      </Box>
+    </>
   );
 }

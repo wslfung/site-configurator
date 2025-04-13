@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, ipcMain } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, systemPreferences, safeStorage } from 'electron';
 import serve from 'electron-serve';
 import * as path from 'path';
 
@@ -14,8 +14,10 @@ app.disableHardwareAcceleration();
 
 function createWindow() {
   const win = new BrowserWindow({
+    title: 'Site Configurator',
     width: 1000,
     height: 800,
+    darkTheme: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
@@ -31,54 +33,50 @@ function createWindow() {
   mainWindow = win;
 }
 
+// Set up IPC handlers
+function setupIpcHandlers() {
+  console.log('Setting up IPC handlers');
+  ipcMain.on('load-page', (event, path) => {
+    console.log('loading page', path);
+    if (mainWindow) {
+      mainWindow.setTitle('Site Configurator');
+      if (isProd) {
+        mainWindow.loadURL(`app://./${path}`);
+      } else {
+        mainWindow.loadURL(`http://localhost:3000${path}`);
+      }
+    } else {
+      console.log('No main window found');
+    }
+  });
+};
+
+const menu = Menu.buildFromTemplate([
+  {
+    label: 'File',
+    submenu: [
+      {
+        label: 'Settings',
+        click: () => {
+          mainWindow?.setTitle('Site Configurator - Settings');
+          if (isProd) {
+            mainWindow?.loadURL('app://./settings');
+          } else {
+            mainWindow?.loadURL('http://localhost:3000/settings');
+          }
+        }
+      },
+      { type: 'separator' },
+      { role: 'quit' }
+    ]
+  }
+]);
+
+
 app.whenReady().then(() => {
   createWindow();
-
-  const menu = Menu.buildFromTemplate([
-    {
-      label: 'File',
-      submenu: [
-        {
-          label: 'Settings',
-          click: () => {
-            if (isProd) {
-              mainWindow?.loadURL('app://./settings');
-            } else {
-              mainWindow?.loadURL('http://localhost:3000/settings');
-            }
-          }
-        },
-        { type: 'separator' },
-        { role: 'quit' }
-      ]
-    }
-  ]);
-
   Menu.setApplicationMenu(menu);
-
-
-  // Set up IPC handlers
-  const setupIpcHandlers = () => {
-    console.log('Setting up IPC handlers');
-    ipcMain.on('load-page', (event, path) => {
-      console.log('Received close-settings event');
-      if (mainWindow) {
-        console.log('Navigating to home');
-        console.log(event);
-        console.log(path);
-        if (isProd) {
-          mainWindow.loadURL(`app://./${path}`);
-        } else {
-          mainWindow.loadURL(`http://localhost:3000${path}`);
-        }
-      } else {
-        console.log('No main window found');
-      }
-    });
-  };
-
   setupIpcHandlers();
-
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();

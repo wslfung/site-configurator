@@ -47,8 +47,10 @@ if (isProd) {
 electron_1.app.disableHardwareAcceleration();
 function createWindow() {
     const win = new electron_1.BrowserWindow({
+        title: 'Site Configurator',
         width: 1000,
         height: 800,
+        darkTheme: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: true,
@@ -63,50 +65,50 @@ function createWindow() {
     }
     mainWindow = win;
 }
-electron_1.app.whenReady().then(() => {
-    createWindow();
-    const menu = electron_1.Menu.buildFromTemplate([
-        {
-            label: 'File',
-            submenu: [
-                {
-                    label: 'Settings',
-                    click: () => {
-                        if (isProd) {
-                            mainWindow === null || mainWindow === void 0 ? void 0 : mainWindow.loadURL('app://./settings');
-                        }
-                        else {
-                            mainWindow === null || mainWindow === void 0 ? void 0 : mainWindow.loadURL('http://localhost:3000/settings');
-                        }
-                    }
-                },
-                { type: 'separator' },
-                { role: 'quit' }
-            ]
-        }
-    ]);
-    electron_1.Menu.setApplicationMenu(menu);
-    // Set up IPC handlers
-    const setupIpcHandlers = () => {
-        console.log('Setting up IPC handlers');
-        electron_1.ipcMain.on('load-page', (event, path) => {
-            console.log('Received close-settings event');
-            if (mainWindow) {
-                console.log('Navigating to home');
-                console.log(event);
-                console.log(path);
-                if (isProd) {
-                    mainWindow.loadURL(`app://./${path}`);
-                }
-                else {
-                    mainWindow.loadURL(`http://localhost:3000${path}`);
-                }
+// Set up IPC handlers
+function setupIpcHandlers() {
+    console.log('Setting up IPC handlers');
+    electron_1.ipcMain.on('load-page', (event, path) => {
+        console.log('loading page', path);
+        if (mainWindow) {
+            mainWindow.setTitle('Site Configurator');
+            if (isProd) {
+                mainWindow.loadURL(`app://./${path}`);
             }
             else {
-                console.log('No main window found');
+                mainWindow.loadURL(`http://localhost:3000${path}`);
             }
-        });
-    };
+        }
+        else {
+            console.log('No main window found');
+        }
+    });
+}
+;
+const menu = electron_1.Menu.buildFromTemplate([
+    {
+        label: 'File',
+        submenu: [
+            {
+                label: 'Settings',
+                click: () => {
+                    mainWindow === null || mainWindow === void 0 ? void 0 : mainWindow.setTitle('Site Configurator - Settings');
+                    if (isProd) {
+                        mainWindow === null || mainWindow === void 0 ? void 0 : mainWindow.loadURL('app://./settings');
+                    }
+                    else {
+                        mainWindow === null || mainWindow === void 0 ? void 0 : mainWindow.loadURL('http://localhost:3000/settings');
+                    }
+                }
+            },
+            { type: 'separator' },
+            { role: 'quit' }
+        ]
+    }
+]);
+electron_1.app.whenReady().then(() => {
+    createWindow();
+    electron_1.Menu.setApplicationMenu(menu);
     setupIpcHandlers();
     electron_1.app.on('activate', () => {
         if (electron_1.BrowserWindow.getAllWindows().length === 0) {
