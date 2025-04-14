@@ -1,16 +1,14 @@
 'use client';
 
-import { Box, Button, Container, Tab, Tabs } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { Box, Button, Container, Tab, Tabs, IconButton, Typography } from '@mui/material';
+import { useState } from 'react';
 import { useTheme } from '@mui/material';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
-import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { useDispatch } from 'react-redux';
-import { setFormData } from '@/store/awsCredentialsFormSlice';
 import AWSCredentialsTabPanel from './awsCredentialsTabPanel';
 import AppearancePanel from './appearancePanel';
 import './settings.css';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 
 
@@ -19,8 +17,7 @@ export default function SettingsPage() {
   const theme = useTheme();
   usePageTitle('Settings ');
   const [value, setValue] = useState(0);
-  const dispatch = useDispatch();
-  
+
   const electronRouter = useElectronRouter();
 
   const handleCancel = () => {
@@ -35,6 +32,14 @@ export default function SettingsPage() {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       <Box className="gear-background" />
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
+        <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
+          <ArrowBackIcon />
+        </IconButton>
+        <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
+          Settings
+        </Typography>
+      </Box>
       <Box sx={{ display: 'flex', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
         <Tabs
           orientation="vertical"
@@ -48,19 +53,6 @@ export default function SettingsPage() {
         </Tabs>
         <AWSCredentialsTabPanel value={value} index={0} />
         <AppearancePanel value={value} index={1} />
-      </Box>
-      <Box>
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={() => {
-            console.log('Cancel button clicked');
-            handleCancel();
-          }}
-          sx={{ marginTop: 5, float: 'right', marginRight: 1 }}
-        >
-          Done
-        </Button>
       </Box>
     </Container>
   );
