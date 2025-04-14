@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, ipcMain, safeStorage } from 'electron';
+import { app, BrowserWindow, Menu, ipcMain, safeStorage, dialog } from 'electron';
 import { initStore, ElectronStore } from './electronStore';
 import serve from 'electron-serve';
 import * as path from 'path';
@@ -62,6 +62,15 @@ function setupIpcHandlers(store: ElectronStore) {
   ipcMain.handle('store-set-aws-credentials', (event, data) => {
     store.set('awsCredentials', data);
   });
+  
+  ipcMain.handle('open-message-dialog', (event, message, title, buttons, type) => {
+    return dialog.showMessageBox({
+      type,
+      title,
+      message,
+      buttons
+    });
+  })
 
   // Theme operations
   ipcMain.handle('store-get-theme-preference', () => {

@@ -11,6 +11,7 @@ declare global {
       getThemePreference: () => Promise<'light' | 'dark'>;
       setThemePreference: (data: 'light' | 'dark') => Promise<void>;
       setTitle: (title: string) => void;
+      openMessageDialog: (message: string, title: string, buttons: string[], type: 'info' | 'warning' | 'error' | 'question') => Promise<void>;
     };
   }
 }

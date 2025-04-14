@@ -83,12 +83,12 @@ export default function SESPage() {
         if (data.Operation === 'create' && credentials) {
             const service = new SESTemplateService(data.SelectedRegion, credentials);
             await service.createTemplate(data);
-            alert('Template created successfully');
+            await window.electronAPI?.openMessageDialog("Template created successfully", 'Create SES Template', [], 'info')
             electronRouter.navigate('/');
         } else if (data.Operation === 'update' && credentials) {
             const service = new SESTemplateService(data.SelectedRegion, credentials);
             await service.updateTemplate(data);
-            alert('Template updated successfully');
+            await window.electronAPI?.openMessageDialog("Template updated successfully", 'Update SES Template', [], 'info')
             electronRouter.navigate('/');
         } else {
             console.error('Failed to save template: No credentials available');
@@ -219,7 +219,7 @@ export default function SESPage() {
                                         control={control}
                                         rules={{ required: 'Text is required' }}
                                         render={({ field }) => (
-                                            <TextField fullWidth label="Text" multiline {...field} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
+                                            <TextField fullWidth label="Text" multiline rows={3} {...field} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
                                         )}
                                     />
                                     <Controller
@@ -227,7 +227,7 @@ export default function SESPage() {
                                         control={control}
                                         rules={{ required: 'HTML is required' }}
                                         render={({ field }) => (
-                                            <TextField fullWidth multiline label="HTML" {...field} sx={{ mb: 2 }} error={!!errors.HtmlPart} helperText={errors.HtmlPart?.message} />
+                                            <TextField fullWidth label="HTML" multiline rows={5} {...field} sx={{ mb: 2 }} error={!!errors.HtmlPart} helperText={errors.HtmlPart?.message} />
                                         )}
                                     />
                                     <Button type="submit" variant="contained" color="primary" sx={{ float: 'right', ml: 2, mr: 2 }} startIcon={<SaveIcon />} disabled={isSubmitting}>

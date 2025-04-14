@@ -33,4 +33,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const decrypted = await ipcRenderer.invoke('decrypt-string', encryptedBase64);
     return decrypted;
   },  
+  openMessageDialog: async (message: string, title: string, buttons: string[], type: 'info' | 'warning' | 'error' | 'question') => {
+    await ipcRenderer.invoke('open-message-dialog', message, title, buttons, type);
+    return;
+  }
 });
