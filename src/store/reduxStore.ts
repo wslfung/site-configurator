@@ -2,15 +2,17 @@ import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import sessionStorage from 'redux-persist/lib/storage/session';
 import lambdaFormSlice from './lambdaFormSlice';
+import themePreferenceFormSlice from './themePreferenceFormSlice';
 
 const persistConfig = {
   key: 'root',
   storage: sessionStorage,
-  whitelist: ['lambdaForm'] // Only persist awsCredentialsForm
+  whitelist: ['lambdaForm', 'themePreferenceForm'] // Only persist awsCredentialsForm
 };
 
 const rootReducer = combineReducers({
   lambdaForm: lambdaFormSlice,
+  themePreferenceForm: themePreferenceFormSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

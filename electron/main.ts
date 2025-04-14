@@ -63,6 +63,15 @@ function setupIpcHandlers(store: ElectronStore) {
     store.set('awsCredentials', data);
   });
 
+  // Theme operations
+  ipcMain.handle('store-get-theme-preference', () => {
+    return store.get('themePreference');
+  });
+
+  ipcMain.handle('store-set-theme-preference', (event, data) => {
+    store.set('themePreference', data);
+  });
+
   // Encryption operations
   ipcMain.handle('encrypt-string', (event, text) => {
     if (safeStorage.isEncryptionAvailable()) {

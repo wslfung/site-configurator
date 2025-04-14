@@ -2,6 +2,7 @@ import { AWSCredentialsFormData } from '../src/types/awsCredentialsForm';
 
 type StoreType = {
   awsCredentials?: AWSCredentialsFormData;
+  themePreference: 'light' | 'dark';
 };
 
 const schema = {
@@ -13,6 +14,10 @@ const schema = {
       secretKey: { type: 'string' }
     },
     required: ['accountId', 'keyId', 'secretKey']
+  },
+  themePreference: {
+    type: 'string',
+    enum: ['light', 'dark']
   }
 } as const;
 

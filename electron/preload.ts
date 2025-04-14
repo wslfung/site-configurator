@@ -18,6 +18,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
   setAWSCredentials: async (data: AWSCredentialsFormData) => {
     await ipcRenderer.invoke('store-set-aws-credentials', data);
   },
+  getThemePreference: async () => {
+    return await ipcRenderer.invoke('store-get-theme-preference') as 'light' | 'dark';
+  },
+  setThemePreference: async (data: 'light' | 'dark') => {
+    await ipcRenderer.invoke('store-set-theme-preference', data);
+  },
   encryptString: async (plainText: string) => {
     const encrypted = await ipcRenderer.invoke('encrypt-string', plainText);
     console.log('Encrypted:', encrypted);
