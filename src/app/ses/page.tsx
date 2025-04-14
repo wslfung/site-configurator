@@ -91,7 +91,7 @@ export default function SESPage() {
             await window.electronAPI?.openMessageDialog("Template updated successfully", 'Update SES Template', [], 'info')
             electronRouter.navigate('/');
         } else {
-            console.error('Failed to save template: No credentials available');
+            await window.electronAPI?.openMessageDialog("Failed to save template: No credentials available", 'Save SES Template', [], 'error')
         }
     }
 
@@ -103,6 +103,7 @@ export default function SESPage() {
             electronRouter.navigate('/');
         } else if (error) {
             console.error('Failed to load AWS credentials:', error);
+            await window.electronAPI?.openMessageDialog("Failed to delete template: No credentials available", 'Delete SES Template', [], 'error')
         }
     }
 
@@ -146,6 +147,7 @@ export default function SESPage() {
                             await handleSave(data);
                         } catch (error) {
                             console.error('Failed to save template:', error);
+                            await window.electronAPI?.openMessageDialog("Failed to save template", 'Save SES Template', [], 'error')
                         } finally {
                             setIsSubmitting(false);
                         }
@@ -199,7 +201,7 @@ export default function SESPage() {
                                 <></>
                             )}
                             <Box sx={{ float: 'right', ml: 2 }}>
-                                {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setValue('Operation', 'create') }} sx={{}}>New</Button>)}
+                                {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setValue('Operation', 'create'); resetField('SelectedTemplate') }} sx={{}}>New</Button>)}
                                 {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={(e) => { e.preventDefault(); handleDelete(); }}>Delete</Button>)}
                             </Box>
                         </Box>
@@ -230,7 +232,7 @@ export default function SESPage() {
                                         control={control}
                                         rules={{ required: 'Text is required' }}
                                         render={({ field }) => (
-                                            <TextField fullWidth label="Text" multiline rows={3} {...field} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
+                                            <TextField fullWidth label="Text" multiline rows={4} {...field} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
                                         )}
                                     />
                                     <Controller
@@ -238,7 +240,7 @@ export default function SESPage() {
                                         control={control}
                                         rules={{ required: 'HTML is required' }}
                                         render={({ field }) => (
-                                            <TextField fullWidth label="HTML" multiline rows={5} {...field} sx={{ mb: 2 }} error={!!errors.HtmlPart} helperText={errors.HtmlPart?.message} />
+                                            <TextField fullWidth label="HTML" multiline rows={12} {...field} sx={{ mb: 2 }} error={!!errors.HtmlPart} helperText={errors.HtmlPart?.message} />
                                         )}
                                     />
                                     <Button type="submit" variant="contained" color="primary" sx={{ float: 'right', ml: 2, mr: 2 }} startIcon={<SaveIcon />} disabled={isSubmitting}>
