@@ -95,6 +95,17 @@ export default function SESPage() {
         }
     }
 
+    const handleDelete = async () => {
+        if (credentials && isSelected(selectedTemplate)) {
+            const service = new SESTemplateService(selectedRegion, credentials);
+            await service.deleteTemplate(selectedTemplate);
+            await window.electronAPI?.openMessageDialog("Template deleted successfully", 'Delete SES Template', [], 'info')
+            electronRouter.navigate('/');
+        } else if (error) {
+            console.error('Failed to load AWS credentials:', error);
+        }
+    }
+
     const theme = useTheme();
     usePageTitle('SES Email Templates');
 
@@ -189,7 +200,7 @@ export default function SESPage() {
                             )}
                             <Box sx={{ float: 'right', ml: 2 }}>
                                 {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setValue('Operation', 'create') }} sx={{}}>New</Button>)}
-                                {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={() => { }}>Delete</Button>)}
+                                {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={(e) => { e.preventDefault(); handleDelete(); }}>Delete</Button>)}
                             </Box>
                         </Box>
                         {((isSelected(selectedRegion) && operation === 'create') ||
