@@ -1,8 +1,9 @@
 'use client';
 
-import { FormControl, InputLabel, useTheme, Select, MenuItem, SelectChangeEvent, ButtonGroup, Button, IconButton, InputAdornment } from "@mui/material"
+import { FormControl, InputLabel, useTheme, Select, MenuItem, SelectChangeEvent, ButtonGroup, Button, IconButton, InputAdornment, TextField, Autocomplete } from "@mui/material"
 import ClearIcon from '@mui/icons-material/Clear'
 import AddIcon from '@mui/icons-material/Add'
+import DeleteIcon from '@mui/icons-material/Delete'
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { Container, Box, Typography } from '@mui/material';
@@ -97,11 +98,12 @@ export default function SESPage() {
                         SES Email Templates
                     </Typography>
                     <form>
-
-                        <FormControl fullWidth sx={{ mt: 4 }}>
-                            <InputLabel>Region</InputLabel>
-                            <Select
-                                {...register('SelectedRegion')}
+                        <Box id="region-selection" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+                            <FormControl fullWidth sx={{ mt: 4 }}>
+                                <InputLabel>Region</InputLabel>
+                                <Select
+                                    value={selectedRegion}
+                                    onChange={(e) => setValue('SelectedRegion', e.target.value)}
                                 label="Region"
                                 sx={{ width: '100%' }}
                                 MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
@@ -114,42 +116,23 @@ export default function SESPage() {
                                 ))}
                             </Select>
                         </FormControl>
-                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
+                        </Box>
+                        <Box id="template-selection" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mt: 2 }}>
                             {(isSelected(selectedRegion) && templateNames.length > 0 && operation === 'update') ? (
 
-                                <FormControl fullWidth sx={{ mr: 2 }}>
-                                    <InputLabel>Template</InputLabel>
-                                    <Select
-                                        value={selectedTemplate}
-                                        onChange={(e) => setValue('SelectedTemplate', e.target.value)}
-                                        label="Template"
-                                        sx={{ width: '100%' }}
-                                        MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
-                                        endAdornment={
-                                            (isSelected(selectedTemplate)) && (
-                                                <InputAdornment position="end">
-                                                    <IconButton
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            setValue('SelectedTemplate', 'none');
-                                                        }}
-                                                        size="small"
-                                                        sx={{ mr: 2 }}
-                                                    >
-                                                        <ClearIcon />
-                                                    </IconButton>
-                                                </InputAdornment>
-                                            ) 
-                                        }
-                                    >
-                                        <MenuItem value="none">Please select a template</MenuItem>
-                                        {templateNames.map((template) => (
-                                            <MenuItem key={template} value={template}>
-                                                {template}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <Autocomplete
+                                    sx={{ mr: 2, flexGrow: 1 }}
+                                    options={templateNames}
+                                    value={isSelected(selectedTemplate) ? selectedTemplate : null}
+                                    onChange={(_, newValue) => setValue('SelectedTemplate', newValue || 'none')}
+                                    renderInput={(params) => (
+                                        <TextField 
+                                            {...params} 
+                                            label="Template"
+                                            placeholder="Search templates..."
+                                        />
+                                    )}
+                                />
 
                             ) : isSelected(selectedRegion) && operation === 'update' && (
                                 <Typography variant="body1" sx={{ }}>There are no templates in this region</Typography>
@@ -158,12 +141,15 @@ export default function SESPage() {
                                 <></>
                             )}
                             <Box sx={{ float: 'right', ml: 2 }}>
-                                {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" onClick={() => { setValue('Operation', 'create') }} sx={{ }}>New</Button>)}
-                                {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" onClick={() => { }}>Delete</Button>)}
+                                {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon/>} onClick={() => { setValue('Operation', 'create') }} sx={{ }}>New</Button>)}
+                                {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" startIcon={<DeleteIcon/>} onClick={() => { }}>Delete</Button>)}
                             </Box>
                         </Box>
+                        <Box id="template-form-fields">
+
+                        </Box>
                         <Box>
-                        {operation === 'create' && isSelected(selectedRegion) && (<Button variant="contained" color="secondary" sx={{ float: 'right' }} onClick={() => { setValue('Operation', 'update') }}>Cancel Create</Button>)}
+                        {operation === 'create' && isSelected(selectedRegion) && (<Button variant="contained" color="warning" sx={{ float: 'right' }} startIcon={<ClearIcon/>} onClick={() => { setValue('Operation', 'update') }}>Cancel Create</Button>)}
                         </Box>
                     </form>
                 </Box>
