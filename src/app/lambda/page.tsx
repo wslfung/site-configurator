@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from "@mui/material"
-import { usePageTitle } from '@/utils/usePageTitle';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { Container, Box, Typography } from '@mui/material';
 import './lambda.css';
 

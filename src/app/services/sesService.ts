@@ -1,17 +1,19 @@
-import { SESClient, CreateTemplateCommand, DeleteTemplateCommand, GetTemplateCommand, ListTemplatesCommand, UpdateTemplateCommand } from '@aws-sdk/client-ses';
+import { SESClient, CreateTemplateCommand, DeleteTemplateCommand, GetTemplateCommand, ListTemplatesCommand, UpdateTemplateCommand, TemplateMetadata } from '@aws-sdk/client-ses';
+import { AWSCredentials } from '@/types/awsCredentials';
+import { SESTemplate } from '@/types/sesTemplate';
 
-export interface SESTemplate {
-    TemplateName: string;
-    SubjectPart: string;
-    TextPart?: string;
-    HtmlPart?: string;
-}
 
 export class SESTemplateService {
     private sesClient: SESClient;
 
-    constructor(region: string) {
-        this.sesClient = new SESClient({ region });
+    constructor(region: string, credentials: AWSCredentials) {
+        this.sesClient = new SESClient({
+            region,
+            credentials: {
+                accessKeyId: credentials.keyId,
+                secretAccessKey: credentials.secretKey
+            }
+        });
     }
 
     async createTemplate(template: SESTemplate): Promise<void> {
@@ -30,7 +32,7 @@ export class SESTemplateService {
         try {
             const command = new ListTemplatesCommand({});
             const response = await this.sesClient.send(command);
-            return (response.TemplatesMetadata || []).map(template => template.Name!);
+            return (response.TemplatesMetadata || []).map((template: TemplateMetadata) => template.Name || '');
         } catch (error) {
             console.error('Error listing templates:', error);
             throw error;

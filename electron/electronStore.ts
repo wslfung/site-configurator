@@ -1,7 +1,7 @@
-import { AWSCredentialsFormData } from '../src/types/awsCredentialsForm';
+import { AWSCredentials } from '../src/types/awsCredentials';
 
 type StoreType = {
-  awsCredentials?: AWSCredentialsFormData;
+  awsCredentials?: AWSCredentials;
   themePreference: 'light' | 'dark';
 };
 

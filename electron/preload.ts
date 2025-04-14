@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron';
 
-import { AWSCredentialsFormData } from '../src/types/awsCredentialsForm';
+import { AWSCredentials } from '../src/types/awsCredentials';
 
 contextBridge.exposeInMainWorld('electronAPI', {
   clearStore: () => {
@@ -13,9 +13,9 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send('load-page', path);
   },
   getAWSCredentials: async () => {
-    return await ipcRenderer.invoke('store-get-aws-credentials') as AWSCredentialsFormData | undefined;
+    return await ipcRenderer.invoke('store-get-aws-credentials') as AWSCredentials | undefined;
   },
-  setAWSCredentials: async (data: AWSCredentialsFormData) => {
+  setAWSCredentials: async (data: AWSCredentials) => {
     await ipcRenderer.invoke('store-set-aws-credentials', data);
   },
   getThemePreference: async () => {

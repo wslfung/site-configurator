@@ -1,8 +1,8 @@
 'use client';
 
-import { useElectronRouter } from '@/utils/useElectronRouter';
+import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { Container, Box, Typography } from '@mui/material';
-import { usePageTitle } from '@/utils/usePageTitle';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { CustomButton } from '@/app/components/CustomButton';
 import { Codystar } from 'next/font/google';
 

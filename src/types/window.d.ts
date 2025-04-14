@@ -1,4 +1,4 @@
-import { AWSCredentialsFormData } from './awsCredentialsForm';
+import { AWSCredentialsFormData } from './awsCredentials';
 
 declare global {
   interface Window {

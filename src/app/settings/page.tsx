@@ -1,11 +1,11 @@
 'use client';
 
-import { Box, Button, Container, Tab, Tabs, Typography } from '@mui/material';
+import { Box, Button, Container, Tab, Tabs } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { useTheme, TextField } from '@mui/material';
-import { useElectronRouter } from '@/utils/useElectronRouter';
-import { AWSCredentialsFormData } from '@/types/awsCredentialsForm';
-import { usePageTitle } from '@/utils/usePageTitle';
+import { useTheme } from '@mui/material';
+import { useElectronRouter } from '@/hooks/useElectronRouter';
+import { useAWSCredentials } from '@/hooks/useAWSCredentials';
+import { usePageTitle } from '@/hooks/usePageTitle';
 import { useDispatch } from 'react-redux';
 import { setFormData } from '@/store/awsCredentialsFormSlice';
 import AWSCredentialsTabPanel from './awsCredentialsTabPanel';

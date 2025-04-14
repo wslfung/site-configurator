@@ -1,22 +1,21 @@
 
 import { Box, Typography, Button, useTheme } from '@mui/material';
 import TabPanel, { TabPanelProps } from './tabPanel';
-import { AWSCredentialsFormData } from '@/types/awsCredentialsForm';
+import { AWSCredentials } from '@/types/awsCredentials';
 import { useForm } from 'react-hook-form';
 import { TextField } from '@mui/material';
 import { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { useElectronRouter } from '@/utils/useElectronRouter';
+import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { setFormData } from '@/store/awsCredentialsFormSlice';
 import { useEffect } from 'react';
 
 export default function AWSCredentialsTabPanel(props: TabPanelProps) {
-    const theme = useTheme();
     const electronRouter = useElectronRouter();
     const [isLoading, setIsLoading] = useState(true);
     const { children, value, index, ...other } = props;
     const dispatch = useDispatch();
-    const { register, handleSubmit, formState: { errors }, reset } = useForm<AWSCredentialsFormData>({
+    const { register, handleSubmit, formState: { errors }, reset } = useForm<AWSCredentials>({
     });
 
     useEffect(() => {
@@ -62,7 +61,7 @@ export default function AWSCredentialsTabPanel(props: TabPanelProps) {
                     <form onSubmit={handleSubmit(async (data) => {
                         const encryptedSecretKey = await window.electronAPI?.encryptString(data.secretKey);
                         if (encryptedSecretKey && window.electronAPI) {
-                            const formData: AWSCredentialsFormData = {
+                            const formData: AWSCredentials = {
                                 accountId: data.accountId,
                                 keyId: data.keyId,
                                 secretKey: encryptedSecretKey,

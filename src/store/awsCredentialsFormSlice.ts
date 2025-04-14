@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { AWSCredentialsFormData } from '@/types/awsCredentialsForm';
+import { AWSCredentials } from '@/types/awsCredentials';
 
-const initialState: AWSCredentialsFormData = {
+const initialState: AWSCredentials = {
   accountId: '',
   keyId: '',
   secretKey: '',
@@ -11,7 +11,7 @@ export const formSlice = createSlice({
   name: 'awsCredentialsForm',
   initialState,
   reducers: {
-    setFormData: (state, action: PayloadAction<AWSCredentialsFormData>) => {
+    setFormData: (state, action: PayloadAction<AWSCredentials>) => {
       return { ...state, ...action.payload };
     },
   },

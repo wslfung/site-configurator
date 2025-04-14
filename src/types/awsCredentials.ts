@@ -1,4 +1,4 @@
-export interface AWSCredentialsFormData {
+export interface AWSCredentials {
   accountId: string;
   keyId: string;
   secretKey: string;
