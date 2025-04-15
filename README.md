@@ -35,6 +35,7 @@ This tool is still very much work in progress.
 - need to work on that background image scaling, it's not working right
 - need to clean up some console logging and better dialog integration with electron
 - Responsive for smaller screens, not a high priority as a desktop app, will would like to add it at some point
+- Leverage more of tailwind or at least more shareable CSS.  This project was done in 3 days, so there was more inline css than I'd hoped.
 
 ### Lambda Deployment Request Tool
 
