@@ -1,17 +1,20 @@
 # site-configurator
 
+This is a Electron/Next.js app that allows one to manage AWS SES templates and update AWS Lambda functions.  It even has a light theme for really dim screens.
+
+
 ![Site Configurtor Main Page](/screenshots/home.png)
 ![Configure AWS Credentials](/screenshots/awsCredentialSettings.png)
+![Light and Dark Theme](/screenshots/lightAndDarkMode.png)
 
-This is a Electron/Next.js app that allows one to manage AWS SES templates and update AWS Lambda functions.
 
 ## AWS SES Template Management
 
+This tool allows you to manage AWS SES templates.
+
 ![Create new email template](/screenshots/newEmailTemplate.png)
 ![Edit or delete existing email template](/screenshots/updateOrDeleteTemplate.png)
-![Light and Dark Theme](/screenshots/lightAndDarkMode.png)
 
-This tool allows you to manage AWS SES templates.
 
 ### Features
 
@@ -22,12 +25,14 @@ This tool allows you to manage AWS SES templates.
 
 ## Lambda Deployment Request Tool
 
-![Create new deployment request](/screenshots/requestDeployment.png)
-![new deployment request successful](/screenshots/requestSuccess.png)
-
 This is actually a very specific usecase for myself. 
 
 This tool allows you to select an artifact in CodeArtifact, select an existing lambda function.  Put in a request to deploy that artifact to the selected lambda function via a message into EventBridge.  EventBridge rules will then trigger deployment based on information provided.
+
+
+![Create new deployment request](/screenshots/requestDeployment.png)
+![new deployment request successful](/screenshots/requestSuccess.png)
+
 
 ### Features
 
