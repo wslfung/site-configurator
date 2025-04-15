@@ -7,11 +7,9 @@ import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import { useForm, Controller } from 'react-hook-form';
 import { LambdaFormData } from '@/types/lambdaForm';
-import './lambda.css';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { regions } from '@/utils/regions';
 import { useAWSCredentials } from '@/hooks/useAWSCredentials';
-import { CodeArtifactService, CodeArtifactPackage } from '@/services/codeArtifactService';
 import { useEffect } from 'react';
 import { isSelected } from '@/utils/tools';
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,7 +21,7 @@ import {
 
 let imagePath = "./aws-lambda.svg";
 if (process.env.NODE_ENV === 'development') {
-    imagePath = "../aws-lambda.svg";
+    imagePath = "./aws-lambda.svg";
 }
 
 interface LambdaDeployFormData extends LambdaFormData {
@@ -197,7 +195,7 @@ export default function LambdaPage() {
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
-                <Box className="lambda-background" sx={{ backgroundImage: `url("${imagePath}")` }} />
+                <Box className="img-background" sx={{ backgroundImage: `url("./aws-lambda.svg")` }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                     <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
                         <ArrowBackIcon />

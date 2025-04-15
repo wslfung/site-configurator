@@ -15,6 +15,18 @@
   font-style: normal;
 }
 
+.img-background {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-size: 450px;
+  background-position-x: -10px;
+  background-position-y: 120%;
+  background-repeat: no-repeat;
+  opacity: 0.1;
+  z-index: -1;
+  
+}
 
 /* :root {
   --background: #ffffff;

@@ -11,18 +11,11 @@ import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { Container, Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
 import { SESTemplateService } from '@/services/sesService';
-import './ses.css';
 import { useForm, Controller } from 'react-hook-form';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { SESTemplate } from '@/types/sesTemplate';
 import { regions } from '@/utils/regions';
 import { isSelected } from '@/utils/tools';
-
-
-let imagePath = "./aws-ses.svg";
-if (process.env.NODE_ENV === 'development') {
-  imagePath = "../aws-ses.svg";
-}
 
 interface SESFormData extends SESTemplate {
     SelectedRegion: string;
@@ -134,7 +127,7 @@ export default function SESPage() {
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
-                <Box className="ses-background" sx={{backgroundImage: `url("${imagePath}")`}} />
+                <Box className="img-background" sx={{backgroundImage: `url("./aws-ses.svg")`}} />
                 <Box sx={{ display: 'block', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>

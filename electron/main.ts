@@ -146,5 +146,9 @@ function createWindow() {
         app.quit();
       }
     });
+    if (!isProd) {
+      // Disable HTTP cache for development
+      app.commandLine.appendSwitch('disable-http-cache');
+    }
   });
 
