@@ -1,10 +1,14 @@
 import { EventBridgeClient, PutEventsCommand, PutEventsRequestEntry } from '@aws-sdk/client-eventbridge';
+import { AWSCredentials } from '@/types/awsCredentials';
 
 export class EventBridgeService {
     private eventBridgeClient: EventBridgeClient;
 
-    constructor(region: string) {
-        this.eventBridgeClient = new EventBridgeClient({ region });
+    constructor(region: string, credentials: AWSCredentials | null) {
+        this.eventBridgeClient = new EventBridgeClient({ region, credentials: credentials ? {
+            accessKeyId: credentials.keyId,
+            secretAccessKey: credentials.secretKey
+        } : undefined });
     }
 
     async putEventToEventBridge(

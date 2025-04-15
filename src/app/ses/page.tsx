@@ -16,15 +16,12 @@ import { useForm, Controller } from 'react-hook-form';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { SESTemplate } from '@/types/sesTemplate';
 import { regions } from '@/utils/regions';
+import { isSelected } from '@/utils/tools';
 
 
 let imagePath = "./aws-ses.svg";
 if (process.env.NODE_ENV === 'development') {
   imagePath = "../aws-ses.svg";
-}
-
-const isSelected = (value: string) => {
-    return value && value !== 'none';
 }
 
 interface SESFormData extends SESTemplate {

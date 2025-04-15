@@ -27,9 +27,6 @@ function createWindow() {
       },
     });
 
-    console.log(`${__dirname}../next/index.html`);
-    console.log(isProd);
-
     if (isProd) {
       // win.webContents.openDevTools();
       win.loadURL(`file://${__dirname}/../next/index.html`);

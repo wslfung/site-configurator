@@ -1,3 +1,4 @@
+import { AWSCredentials } from '@/types/awsCredentials';
 import { LambdaClient, ListFunctionsCommand, FunctionConfiguration } from '@aws-sdk/client-lambda';
 
 export interface Package {
@@ -10,8 +11,11 @@ export class LambdaService {
 
     private lambdaClient: LambdaClient;
 
-    constructor(region: string) {
-        this.lambdaClient = new LambdaClient({ region });
+    constructor(region: string, credentials: AWSCredentials | null) {
+        this.lambdaClient = new LambdaClient({ region, credentials: credentials ? {
+            accessKeyId: credentials.keyId,
+            secretAccessKey: credentials.secretKey
+        } : undefined });
     }
 
     async listLambdaFunctions(): Promise<FunctionConfiguration[]> {
