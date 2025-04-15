@@ -1,8 +1,15 @@
 # site-configurator
 
+![Site Configurtor Main Page](/screenshots/home.png)
+![Configure AWS Credentials](/screenshots/awsCredentialSettings.png)
+
 This is a Electron/Next.js app that allows one to manage AWS SES templates and update AWS Lambda functions.
 
 ## AWS SES Template Management
+
+![Create new email template](/screenshots/newEmailTemplate.png)
+![Edit or delete existing email template](/screenshots/updateOrDeleteTemplate.png)
+![Light and Dark Theme](/screenshots/lightAndDarkMode.png)
 
 This tool allows you to manage AWS SES templates.
 
@@ -14,6 +21,9 @@ This tool allows you to manage AWS SES templates.
 - Delete template
 
 ## Lambda Deployment Request Tool
+
+![Create new deployment request](/screenshots/requestDeployment.png)
+![new deployment request successful](/screenshots/requestSuccess.png)
 
 This is actually a very specific usecase for myself. 
 
