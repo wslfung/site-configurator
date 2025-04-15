@@ -72,7 +72,7 @@ function createWindow() {
     });
     
     ipcMain.handle('open-message-dialog', (event, message, title, buttons, type) => {
-      return dialog.showMessageBox({
+      return dialog.showMessageBoxSync({
         type,
         message,
         title,
@@ -94,8 +94,14 @@ function createWindow() {
     ipcMain.handle('encrypt-string', (event, text) => {
       if (safeStorage.isEncryptionAvailable()) {
         return safeStorage.encryptString(text).toString('base64');
+      } else {
+        dialog.showMessageBoxSync({
+          type: 'error',
+          message: 'Encryption not available',
+          title: 'Encryption Error'
+        });
+        return null;
       }
-      return null;
     });
 
     ipcMain.handle('decrypt-string', (event, encryptedBase64) => {
@@ -106,8 +112,14 @@ function createWindow() {
           console.error('Decryption error:', error);
           return null;
         }
+      } else {
+        dialog.showMessageBoxSync({
+          type: 'error',
+          message: 'Decryption not available',
+          title: 'Decryption Error'
+        });
+        return null;
       }
-      return null;
     });
   }
 
