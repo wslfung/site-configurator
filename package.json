@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "main": "dist/electron/main.js",
+  "author": "Wilson Fung <wilson.fung@ideaspark.ca>",
+  "maintainers": ["Wilson Fung <wilson.fung@ideaspark.ca>"],
   "scripts": {
     "dev": "cross-env NODE_ENV=development next dev",
     "build": "next build",
