@@ -50,6 +50,11 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ./artifacts/**
+          files: 
+            ./artifacts/latest*.yml
+            ./artifacts/*.dmg
+            ./artifacts/*Setup*.exe
+            ./artifacts/*.AppImage
+
         env:
           GITHUB_TOKEN: ${{ secrets.GH_DEPLOY_KEY }}
