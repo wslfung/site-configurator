@@ -10,13 +10,19 @@ import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { Container, Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { SESTemplateService } from '@/app/services/sesService';
+import { SESTemplateService } from '@/services/sesService';
 import './ses.css';
 import { useForm, Controller } from 'react-hook-form';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { SESTemplate } from '@/types/sesTemplate';
+import { regions } from '@/utils/regions';
 
-const regions: string[] = ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'eu-west-1', 'eu-west-2', 'eu-west-3', 'eu-central-1', 'eu-north-1', 'ap-south-1', 'ap-northeast-1', 'ap-northeast-2', 'ap-northeast-3', 'ap-southeast-1', 'ap-southeast-2', 'ca-central-1', 'sa-east-1'];
+
+let imagePath = "./aws-ses.svg";
+if (process.env.NODE_ENV === 'development') {
+  imagePath = "../aws-ses.svg";
+}
+
 const isSelected = (value: string) => {
     return value && value !== 'none';
 }
@@ -131,7 +137,7 @@ export default function SESPage() {
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
-                <Box className="ses-background" />
+                <Box className="ses-background" sx={{backgroundImage: `url("${imagePath}")`}} />
                 <Box sx={{ display: 'block', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
                         <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>

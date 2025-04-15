@@ -10,7 +10,10 @@ import AppearancePanel from './appearancePanel';
 import './settings.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
-
+let imagePath = "./gear.svg";
+if (process.env.NODE_ENV === 'development') {
+  imagePath = "../gear.svg";
+}
 
 
 export default function SettingsPage() {
@@ -31,7 +34,7 @@ export default function SettingsPage() {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <Box className="gear-background" />
+      <Box className="gear-background" sx={{backgroundImage: `url("${imagePath}")`}} />
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
         <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
           <ArrowBackIcon />

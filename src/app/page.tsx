@@ -4,9 +4,7 @@ import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { Container, Box, Typography } from '@mui/material';
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { CustomButton } from '@/app/components/CustomButton';
-import { Codystar } from 'next/font/google';
 
-const codystar = Codystar({ weight: '400', subsets: ['latin'] });
 
 export default function Home() {
   usePageTitle('Home');
@@ -20,22 +18,22 @@ export default function Home() {
           Site Configurator
         </Typography>
           <CustomButton
-            bgimage="/aws-ses.svg"
+            bgimage="aws-ses.svg"
             type="button"
             fullWidth
             sx={{ mt: 5}}
             onClick={() => electronRouter.navigate('/ses')}
           >
-            <Typography fontFamily={codystar.style.fontFamily} sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>SES Email Templates</Typography>
+            <Typography fontFamily="Codystar" className='codystar-regular' sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>SES Email Templates</Typography>
           </CustomButton>
           <CustomButton
-            bgimage="/aws-lambda.svg"
+            bgimage="aws-lambda.svg"
             type="button"
             fullWidth
             sx={{ mt: 3, textAlign: 'left' }}
             onClick={() => electronRouter.navigate('/lambda')}
           >
-            <Typography fontFamily={codystar.style.fontFamily} sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>AWS Lambda Deployment</Typography>
+            <Typography fontFamily="Codystar" className='codystar-regular' sx={{ fontWeight: 'bold', fontSize: '1.4rem', paddingTop: '30px' }}>AWS Lambda Deployment</Typography>
           </CustomButton>
       </Box>
     </Container>
