@@ -56,8 +56,6 @@ This tool is still very much work in progress.
 
 ### Lambda Deployment Request Tool
 
-- At the moment, the eventbridgbe bus and region is hardcoded.  Need to add support for user selectable region and bus
-- UI is not complete, it's still very primitive compared to SES Template Management **IMPORTANT**
 - Add Support for Batch deployment
 
 ### AWS SES Template Management
