@@ -3,36 +3,38 @@
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { Container, Box, Typography, IconButton, useTheme, Stepper, Step, StepLabel, StepContent } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import FileUploadIcon from '@mui/icons-material/FileUpload';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { LambdaDeployFormData } from '@/types/lambdaForm';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
-import { regions } from '@/utils/regions';
-import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { useEffect, useState } from 'react';
-import { isSelected } from '@/utils/tools';
 import CodeArtifactSection from './codeArtifactSection';
 import LambdaSection from './lambdaSection';
+import EventBridgeSection from './eventBridgeSection';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store/reduxStore';
-import {
-    setTargetRegion, setCredentials, setLambdaFunctionName,
-    fetchLambdaFunctions, deployLambda
-} from '@/store/lambdaFormSlice';
+import { requestDeployment, resetAll as resetEB } from '@/store/eventBridgeFormSlice';
+import { resetAll as resetLambda } from '@/store/lambdaFormSlice';
+import { resetAll as resetCodeArtifact } from '@/store/codeArtifactFormSlice';
 
 export default function LambdaPage() {
     const [activeStep, setActiveStep] = useState(0);
     const electronRouter = useElectronRouter();
     const dispatch = useDispatch<AppDispatch>();
-    const {
-        targetRegion, lambdaFunctionName,
-        lambdaFunctions, deployResult, loading, error: lambdaError
-    } = useSelector((state: RootState) => state.lambdaForm);
+    const { format, namespace } = useSelector((state: RootState) => state.codeArtifactForm);
+    const { deployResult } = useSelector((state: RootState) => state.eventBridgeForm);
     const { control, getValues, setValue, resetField, watch, handleSubmit, formState: { errors }, reset } = useForm<LambdaDeployFormData>({
         defaultValues: {
+            region: 'none',
+            domain: 'none',
+            name: 'none',
+            repository: 'none',
+            packageName: '',
+            version: '',
             targetRegion: 'none',
-            lambdaFunctionName: ''
+            lambdaFunctionName: '',
+            ebBus: 'none',
+            ebSource: '',
+            detailType: ''  
         }
     });
 
@@ -51,30 +53,30 @@ export default function LambdaPage() {
     const theme = useTheme();
     usePageTitle('AWS Lambda Deployment');
 
-    const handleLambdaDeployment = () => {
-        // if (!credentials) {
-        //     window.electronAPI?.openMessageDialog('Unable to deploy, no credentials available', 'Error', ['OK'], 'error');
-        //     return;
-        // }
-        // Find the package object to get namespace/format if available
-        // const pack = packages.find(pkg => pkg.name === codePackage);
-        // dispatch(deployLambda({
-        //     region,
-        //     credentials,
-        //     domain,
-        //     repository,
-        //     packageName: codePackage,
-        //     namespace: pack?.namespace || '',
-        //     format: pack?.format || 'generic',
-        //     version,
-        //     targetRegion,
-        //     lambdaFunctionName
-        // }));
+    const handleLambdaDeployment = (data: LambdaDeployFormData) => {
+        dispatch(requestDeployment({
+            region: data.region,
+            domain: data.domain,
+            repository: data.repository,
+            packageName: data.packageName,
+            namespace: namespace,
+            format: format.toString(),
+            version: data.version,
+            lambdaRegion: data.targetRegion,
+            lambdaFunctionName: data.lambdaFunctionName,
+            ebBus: data.ebBus,
+            ebSource: data.ebSource,
+            detailType: data.detailType
+        }));
     }
 
     useEffect(() => {
         if (deployResult) {
             window.electronAPI?.openMessageDialog('Lambda deployment requested successfully', 'Success', ['OK'], 'info');
+            dispatch(resetLambda());
+            dispatch(resetEB());
+            dispatch(resetCodeArtifact());
+            window.electronAPI?.loadPage('/');
         }
     }, [deployResult]);
 
@@ -90,9 +92,7 @@ export default function LambdaPage() {
                         AWS Lambda Deployment
                     </Typography>
                 </Box>
-                <form onSubmit={handleSubmit(() => {
-                    handleLambdaDeployment();
-                })}>
+                <form onSubmit={handleSubmit((data) => handleLambdaDeployment(data))}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '95%'}}>
                         <Stepper activeStep={activeStep} orientation="vertical" sx={{ width: '90%', display: 'flex', justifyContent: 'center'}}>
                             <Step key="code-artifact">
@@ -102,10 +102,7 @@ export default function LambdaPage() {
                                 <LambdaSection collapse={activeStep !== 1} control={control} setValue={setValue} resetField={resetField} nextStep={handleNext} previousStep={handleBack} />
                             </Step>
                             <Step key="event-bridge">
-                                <StepLabel>Event Bridge</StepLabel>
-                                <StepContent>
-                                    <p>This is placeholder for Event Bridge step</p>
-                                </StepContent>
+                                <EventBridgeSection collapse={activeStep !== 2} control={control} setValue={setValue} resetField={resetField} errors={errors} watch={watch} nextStep={handleNext} previousStep={handleBack} />
                             </Step>
                         </Stepper>
                     </Box>

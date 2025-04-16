@@ -18,26 +18,27 @@ export default function CodeArtifactSection({ collapse, control, setValue, reset
         setValue('region', value);
         resetField('domain');
         resetField('repository');
-        resetField('package');
+        resetField('packageName');
         resetField('version');
     };
     const handleDomainChange = (value: string) => {
         dispatch(setDomain(value));
         setValue('domain', value);
         resetField('repository');
-        resetField('package');
+        resetField('packageName');
         resetField('version');
     };
     const handleRepositoryChange = (value: string) => {
         dispatch(setRepository(value));
         setValue('repository', value);
-        resetField('package');
+        resetField('packageName');
         resetField('version');
     };
     const handlePackageChange = (value: string | null) => {
         const safeValue = value ?? '';
-        dispatch(setPackage(safeValue));
-        setValue('package', safeValue);
+        const pkg = packages.find(p => p.name === safeValue);
+        if (pkg) dispatch(setPackage(pkg));
+        setValue('packageName', safeValue);
         resetField('version');
     };
     const handleVersionChange = (value: string | null) => {
@@ -198,7 +199,7 @@ export default function CodeArtifactSection({ collapse, control, setValue, reset
                 <ConditionalDisplay condition={isSelected(repository) && packages.length > 0}>
                     <Box id="package-selection" sx={{ mb: 2 }}>
                         <Controller
-                            name="package"
+                            name="packageName"
                             control={control}
                             render={({ field, fieldState }) => (
                                 <Autocomplete

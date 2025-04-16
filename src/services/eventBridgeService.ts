@@ -1,4 +1,4 @@
-import { EventBridgeClient, PutEventsCommand, PutEventsRequestEntry } from '@aws-sdk/client-eventbridge';
+import { EventBridgeClient, PutEventsCommand, PutEventsRequestEntry, ListEventBusesCommand } from '@aws-sdk/client-eventbridge';
 import { AWSCredentials } from '@/types/awsCredentials';
 
 export class EventBridgeService {
@@ -9,6 +9,21 @@ export class EventBridgeService {
             accessKeyId: credentials.keyId,
             secretAccessKey: credentials.secretKey
         } : undefined });
+    }
+
+    /**
+     * Lists all EventBridge event buses in the configured region.
+     * @returns An array of event bus names.
+     */
+    async listEventBuses(): Promise<string[]> {
+        try {
+            const command = new ListEventBusesCommand({});
+            const response = await this.eventBridgeClient.send(command);
+            return (response.EventBuses || []).map(bus => bus.Name || '');
+        } catch (error) {
+            console.error('Error listing EventBridge event buses:', error);
+            throw error;
+        }
     }
 
     async putEventToEventBridge(

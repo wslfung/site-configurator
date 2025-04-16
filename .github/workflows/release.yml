@@ -57,9 +57,9 @@ jobs:
         uses: softprops/action-gh-release@v2
 
         with:
+          generate_release_notes: false
           files: |
-            ./artifacts/**/Site.*.Setup.*.exe
+            ./artifacts/**/Site.*.exe
+            ./artifacts/**/Site.**.exe
             ./artifacts/**/Site.*.AppImage
-
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_DEPLOY_KEY }}
+          github_token: ${{ secrets.GH_DEPLOY_KEY }}

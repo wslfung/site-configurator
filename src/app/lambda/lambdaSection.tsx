@@ -11,6 +11,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '@/store/reduxStore';
 import ConditionalDisplay from '@/app/components/ConditionalDisplay';
 import { setTargetRegion, setLambdaFunctionName, fetchLambdaFunctions } from '@/store/lambdaFormSlice';
+import { S } from '@/utils/tools';
 
 export default function LambdaSection({ collapse, control, setValue, resetField, nextStep, previousStep }: { collapse: boolean, control: Control<LambdaDeployFormData, any, LambdaDeployFormData>, setValue: UseFormSetValue<LambdaDeployFormData>, resetField: UseFormResetField<LambdaDeployFormData>, nextStep: () => void, previousStep: () => void }) {
     const dispatch = useDispatch<AppDispatch>();
@@ -40,7 +41,14 @@ export default function LambdaSection({ collapse, control, setValue, resetField,
 
     return (
         <>
-            <StepLabel>Select Lambda</StepLabel>
+            <StepLabel>
+                <ConditionalDisplay condition={!collapse}>
+                    Select Lambda Function
+                </ConditionalDisplay>
+                <ConditionalDisplay condition={collapse}>
+                    <b>Lambda Function:</b> region: <S>{targetRegion}</S>, lambda function: <S>{lambdaFunctionName}</S>
+                </ConditionalDisplay>
+            </StepLabel>
             <StepContent>
                 <Box id="target-region-selection" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, mt: 4 }}>
                     <FormControl fullWidth>

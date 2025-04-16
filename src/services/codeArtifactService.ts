@@ -4,7 +4,7 @@ import { AWSCredentials } from '@/types/awsCredentials';
 export interface CodeArtifactPackage {
     name: string;
     namespace?: string;
-    format: string;
+    format: PackageFormat;
 }
 
 export class CodeArtifactService {
@@ -52,7 +52,7 @@ export class CodeArtifactService {
             return (response.packages || []).map(pkg => ({
                 name: pkg.package || '',
                 namespace: pkg.namespace,
-                format: pkg.format || ''
+                format: pkg.format || PackageFormat.GENERIC
             }));
         } catch (error) {
             console.error('Error listing CodeArtifact packages:', error);

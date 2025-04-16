@@ -4,8 +4,11 @@ export interface LambdaDeployFormData {
   name: string;
   domain: string;
   repository: string;
-  package: string;
+  packageName: string;
   version: string;
   targetRegion: string;
   lambdaFunctionName: string;
+  ebBus: string;
+  ebSource: string;
+  detailType: string;
 }

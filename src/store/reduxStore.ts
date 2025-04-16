@@ -15,17 +15,19 @@ if (typeof window !== 'undefined') {
 import themePreferenceFormSlice from './themePreferenceFormSlice';
 import lambdaFormSlice from './lambdaFormSlice';
 import codeArtifactFormSlice from './codeArtifactFormSlice';
+import eventBridgeFormSlice from './eventBridgeFormSlice';
 
 const persistConfig = {
   key: 'root',
   storage: sessionStorageBackend,
-  whitelist: ['themePreferenceForm', 'lambdaForm', 'codeArtifactForm'],
+  whitelist: ['themePreferenceForm', 'lambdaForm', 'codeArtifactForm', 'eventBridgeForm'],
 };
 
 const rootReducer = combineReducers({
   codeArtifactForm: codeArtifactFormSlice,
   themePreferenceForm: themePreferenceFormSlice,
-  lambdaForm: lambdaFormSlice
+  lambdaForm: lambdaFormSlice,
+  eventBridgeForm: eventBridgeFormSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

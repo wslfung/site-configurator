@@ -2,12 +2,15 @@ import { CodeArtifactService, CodeArtifactPackage } from '@/services/codeArtifac
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { AWSCredentials } from '@/types/awsCredentials';
 import { getAWSCredentials } from '@/utils/tools';
+import { PackageFormat } from '@aws-sdk/client-codeartifact';
 
 interface CodeArtifactFormState {
   region: string;
   domain: string;
   repository: string;
   packageName: string;
+  namespace: string;
+  format: PackageFormat;
   version: string;
   targetRegion: string;
   domains: string[];
@@ -23,6 +26,8 @@ const initialState: CodeArtifactFormState = {
   domain: 'none',
   repository: 'none',
   packageName: '',
+  namespace: '',
+  format: PackageFormat.GENERIC,
   version: '',
   targetRegion: 'none',
   domains: [],
@@ -135,8 +140,10 @@ const lambdaDeploySlice = createSlice({
       state.packages = [];
       state.versions = [];
     },
-    setPackage(state, action: PayloadAction<string>) {
-      state.packageName = action.payload;
+    setPackage(state, action: PayloadAction<CodeArtifactPackage>) {
+      state.packageName = action.payload.name;
+      state.namespace = action.payload.namespace || '';
+      state.format = action.payload.format || PackageFormat.GENERIC;
       state.version = '';
       state.versions = [];
     },
