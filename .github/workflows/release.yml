@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-24.04-arm, ubuntu-latest, windows-latest, windows-11-arm] # macos-15 is not supported since Developer ID is not available
+        os: [ubuntu-24.04-arm, ubuntu-latest, windows-latest] # macos-15 is not supported since Developer ID is not available, disabled windows-11-arm since it's using the same file name as the amd64 version and overwrites it.
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
 
         with:
           files: |
-            ./artifacts/**/Site.*.exe
+            ./artifacts/**/Site.*.Setup.*.exe
             ./artifacts/**/Site.*.AppImage
 
         env:
