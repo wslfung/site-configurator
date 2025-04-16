@@ -13,17 +13,19 @@ if (typeof window !== 'undefined') {
 }
 
 import themePreferenceFormSlice from './themePreferenceFormSlice';
-import lambdaDeploySlice from './lambdaDeploySlice';
+import lambdaFormSlice from './lambdaFormSlice';
+import codeArtifactFormSlice from './codeArtifactFormSlice';
 
 const persistConfig = {
   key: 'root',
   storage: sessionStorageBackend,
-  whitelist: ['themePreferenceForm', 'lambdaDeploy'], // Persist lambdaDeploy state as well
+  whitelist: ['themePreferenceForm', 'lambdaForm', 'codeArtifactForm'],
 };
 
 const rootReducer = combineReducers({
+  codeArtifactForm: codeArtifactFormSlice,
   themePreferenceForm: themePreferenceFormSlice,
-  lambdaDeploy: lambdaDeploySlice
+  lambdaForm: lambdaFormSlice
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

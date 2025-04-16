@@ -81,12 +81,10 @@ function createWindow() {
     });
 
     ipcMain.handle('store-get-theme-preference', () => {
-      console.log('Getting theme preference');
       return store.get('themePreference');
     });
 
     ipcMain.handle('store-set-theme-preference', (event, data) => {
-      console.log('Setting theme preference to:', data);
       store.set('themePreference', data);
     });
 

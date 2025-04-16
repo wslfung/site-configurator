@@ -1,5 +1,5 @@
 import { AWSCredentials } from '@/types/awsCredentials';
-import { LambdaClient, ListFunctionsCommand, FunctionConfiguration } from '@aws-sdk/client-lambda';
+import { LambdaClient, ListFunctionsCommand, ListTagsCommand, FunctionConfiguration } from '@aws-sdk/client-lambda';
 
 export interface Package {
     name: string;
@@ -16,6 +16,22 @@ export class LambdaService {
             accessKeyId: credentials.keyId,
             secretAccessKey: credentials.secretKey
         } : undefined });
+    }
+
+    /**
+     * Retrieves the tags associated with a Lambda function by ARN.
+     * @param functionArn The ARN of the Lambda function.
+     * @returns A key-value object of tags.
+     */
+    async getFunctionTags(functionArn: string): Promise<Record<string, string>> {
+        try {
+            const command = new ListTagsCommand({ Resource: functionArn });
+            const response = await this.lambdaClient.send(command);
+            return response.Tags || {};
+        } catch (error) {
+            console.error('Error retrieving Lambda function tags:', error);
+            throw error;
+        }
     }
 
     async listLambdaFunctions(): Promise<FunctionConfiguration[]> {

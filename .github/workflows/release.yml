@@ -58,8 +58,8 @@ jobs:
 
         with:
           files: |
-            ./artifacts/**/*.exe
-            ./artifacts/**/*.AppImage
+            ./artifacts/**/Site.*.exe
+            ./artifacts/**/Site.*.AppImage
 
         env:
           GITHUB_TOKEN: ${{ secrets.GH_DEPLOY_KEY }}

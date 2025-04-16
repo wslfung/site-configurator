@@ -1,6 +1,6 @@
 {
   "name": "site-configurator",
-  "version": "0.1.0",
+  "version": "0.1.11",
   "private": true,
   "main": "dist/electron/main.js",
   "author": "Wilson Fung <wilson.fung@ideaspark.ca>",
