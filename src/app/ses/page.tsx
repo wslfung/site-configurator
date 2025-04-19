@@ -1,6 +1,6 @@
 'use client';
 
-import { FormControl, InputLabel, useTheme, Select, MenuItem, Button, TextField, Autocomplete, IconButton } from "@mui/material"
+import { FormControl, InputLabel, useTheme, Select, MenuItem, Button, TextField, Autocomplete, IconButton, Snackbar, Alert } from "@mui/material"
 import ClearIcon from '@mui/icons-material/Clear'
 import AddIcon from '@mui/icons-material/Add'
 import SaveIcon from '@mui/icons-material/Save'
@@ -24,6 +24,7 @@ interface SESFormData extends SESTemplate {
 }
 export default function SESPage() {
     const electronRouter = useElectronRouter();
+    const [isAWSCredentialAvailable, setIsAWSCredentialAvailable] = useState(true);
     const { credentials, isLoading, error } = useAWSCredentials();
     const [templateNames, setTemplateNames] = useState<string[]>([]);
     const { control, getValues, setValue, resetField, watch, handleSubmit, formState: { errors }, reset } = useForm<SESFormData>({
@@ -106,6 +107,14 @@ export default function SESPage() {
     const theme = useTheme();
     usePageTitle('SES Email Templates');
 
+    useEffect(() => {
+        if (credentials && credentials.keyId && credentials.secretKey && credentials.accountId) {
+            setIsAWSCredentialAvailable(true);
+        } else {
+            setIsAWSCredentialAvailable(false);
+        }
+    }, [isLoading, credentials])
+
     // Watch for region changes and credentials loading state
     useEffect(() => {
         if (!isLoading && isSelected(selectedRegion)) {
@@ -127,6 +136,15 @@ export default function SESPage() {
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Snackbar
+                    open={!isAWSCredentialAvailable}
+                    message="AWS Credentials not available"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                >
+                    <Alert severity="error" sx={{ width: '100%' }}>
+                        Please configure AWS credentials first.  Go to <Button variant="text" onClick={() => electronRouter.navigate('/settings')}>Settings</Button> to configure.
+                    </Alert>
+                </Snackbar>                
                 <Box className="img-background" sx={{backgroundImage: `url("./aws-ses.svg")`}} />
                 <Box sx={{ display: 'block', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>

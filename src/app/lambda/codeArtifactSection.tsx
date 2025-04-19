@@ -52,7 +52,6 @@ export default function CodeArtifactSection({ collapse, control, setValue, reset
     } = useSelector((state: RootState) => state.codeArtifactForm);
 
     useEffect(() => {
-        console.log(collapse, region);
         if (!collapse && isSelected(region)) {
             dispatch(fetchDomains({ region }));
         }

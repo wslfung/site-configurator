@@ -1,7 +1,7 @@
 'use client';
 
 import { usePageTitle } from '@/hooks/usePageTitle';
-import { Container, Box, Typography, IconButton, useTheme, Stepper, Step, StepLabel, StepContent } from '@mui/material';
+import { Container, Box, Typography, IconButton, useTheme, Stepper, Step, Snackbar, Alert, Button} from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useForm } from 'react-hook-form';
 import { LambdaDeployFormData } from '@/types/lambdaForm';
@@ -15,9 +15,13 @@ import { RootState, AppDispatch } from '@/store/reduxStore';
 import { requestDeployment, resetAll as resetEB } from '@/store/eventBridgeFormSlice';
 import { resetAll as resetLambda } from '@/store/lambdaFormSlice';
 import { resetAll as resetCodeArtifact } from '@/store/codeArtifactFormSlice';
+import { AWSCredentials } from '@/types/awsCredentials';
+import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 
 export default function LambdaPage() {
     const [activeStep, setActiveStep] = useState(0);
+    const [isAWSCredentialAvailable, setIsAWSCredentialAvailable] = useState(true);
+    const { credentials, isLoading } = useAWSCredentials();
     const electronRouter = useElectronRouter();
     const dispatch = useDispatch<AppDispatch>();
     const { format, namespace } = useSelector((state: RootState) => state.codeArtifactForm);
@@ -80,9 +84,28 @@ export default function LambdaPage() {
         }
     }, [deployResult]);
 
+    useEffect(() => {
+        if (!isLoading) {
+            if (credentials && credentials.keyId && credentials.secretKey && credentials.accountId) {
+                setIsAWSCredentialAvailable(true);
+            } else {
+                setIsAWSCredentialAvailable(false);
+            }
+        } 
+    }, [isLoading, credentials]);
+
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
+                <Snackbar
+                    open={!isAWSCredentialAvailable}
+                    message="AWS Credentials not available"
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                >
+                    <Alert severity="error" sx={{ width: '100%' }}>
+                        Please configure AWS credentials first.  Go to <Button variant="text" onClick={() => electronRouter.navigate('/settings')}>Settings</Button> to configure.
+                    </Alert>
+                </Snackbar>
                 <Box className="img-background" sx={{ backgroundImage: `url("./aws-lambda.svg")` }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', mb: 4 }}>
                     <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
