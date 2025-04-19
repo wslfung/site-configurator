@@ -8,7 +8,7 @@ export async function getAWSCredentials() {
     try {
         const credentials = await window.electronAPI?.getAWSCredentials();
         const decryptedSecret = await window.electronAPI?.decryptString(credentials?.secretKey || '');
-        if (!decryptedSecret) {
+        if (!credentials || !decryptedSecret) {
             throw new Error('Unable to decrypt secret key');
         }
         credentials.secretKey = decryptedSecret;
