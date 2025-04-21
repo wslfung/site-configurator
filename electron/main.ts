@@ -103,11 +103,16 @@ function setupIpcHandlers(store: ElectronStore) {
       }
       const crypto = require('crypto');
       const algorithm = 'aes-256-cbc';
-      const password = secret;
-      const cipher = crypto.createCipher(algorithm, password);
+      // Derive a 32-byte key from the secret
+      const key = crypto.createHash('sha256').update(secret).digest();
+      // Generate a random 16-byte IV
+      const iv = crypto.randomBytes(16);
+      const cipher = crypto.createCipheriv(algorithm, key, iv);
       let crypted = cipher.update(text, 'utf8', 'base64');
       crypted += cipher.final('base64');
-      return crypted;
+      // Prepend IV to the encrypted data (IV is needed for decryption)
+      const result = Buffer.concat([iv, Buffer.from(crypted, 'base64')]).toString('base64');
+      return result;
     }
   });
 
@@ -117,6 +122,27 @@ function setupIpcHandlers(store: ElectronStore) {
         return safeStorage.decryptString(Buffer.from(encryptedBase64, 'base64')).toString();
       } catch (error) {
         console.error('Decryption error:', error);
+        return null;
+      }
+    } else if (encryptedBase64 && secret) {
+      try {
+        const crypto = require('crypto');
+        const algorithm = 'aes-256-cbc';
+        const key = crypto.createHash('sha256').update(secret).digest();
+        const input = Buffer.from(encryptedBase64, 'base64');
+        // Extract IV (first 16 bytes)
+        const iv = input.slice(0, 16);
+        const encryptedText = input.slice(16);
+        const decipher = crypto.createDecipheriv(algorithm, key, iv);
+        let decrypted = decipher.update(encryptedText, undefined, 'utf8');
+        decrypted += decipher.final('utf8');
+        return decrypted;
+      } catch (error) {
+        dialog.showMessageBoxSync({
+          type: 'error',
+          message: 'Decryption failed: ' + error.message,
+          title: 'Decryption Error'
+        });
         return null;
       }
     } else {
