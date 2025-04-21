@@ -130,9 +130,9 @@ function setupIpcHandlers(store: ElectronStore) {
         const algorithm = 'aes-256-cbc';
         const key = crypto.createHash('sha256').update(secret).digest();
         const input = Buffer.from(encryptedBase64, 'base64');
-        // Extract IV (first 16 bytes)
-        const iv = input.slice(0, 16);
-        const encryptedText = input.slice(16);
+        // Extract IV (first 16 bytes) and encrypted text using subarray
+        const iv = input.subarray(0, 16);
+        const encryptedText = input.subarray(16);
         const decipher = crypto.createDecipheriv(algorithm, key, iv);
         let decrypted = decipher.update(encryptedText, undefined, 'utf8');
         decrypted += decipher.final('utf8');
