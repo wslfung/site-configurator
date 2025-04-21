@@ -138,9 +138,13 @@ function setupIpcHandlers(store: ElectronStore) {
         decrypted += decipher.final('utf8');
         return decrypted;
       } catch (error) {
+        let errMsg = 'Decryption failed';
+        if (error instanceof Error) {
+          errMsg += error.message;
+        }
         dialog.showMessageBoxSync({
           type: 'error',
-          message: 'Decryption failed: ' + error.message,
+          message: errMsg,
           title: 'Decryption Error'
         });
         return null;
