@@ -1,6 +1,6 @@
 import { styled } from '@mui/material/styles';
 
-export const isSelected: (value: string) => boolean = (value: string) => {
+export const isSelected: (value: string | null) => boolean = (value: string | null) => {
     return !!(value && value !== 'none');
 }
 

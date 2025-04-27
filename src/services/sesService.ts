@@ -1,7 +1,7 @@
-import { SESClient, CreateTemplateCommand, DeleteTemplateCommand, GetTemplateCommand, ListTemplatesCommand, UpdateTemplateCommand, TemplateMetadata } from '@aws-sdk/client-ses';
+import { SESClient, CreateTemplateCommand, DeleteTemplateCommand, GetTemplateCommand, ListTemplatesCommand, UpdateTemplateCommand, TemplateMetadata, SendTemplatedEmailCommand } from '@aws-sdk/client-ses';
 import { AWSCredentials } from '@/types/awsCredentials';
 import { SESTemplate } from '@/types/sesTemplate';
-
+import he from 'he';
 
 export class SESTemplateService {
     private sesClient: SESClient;
@@ -72,6 +72,34 @@ export class SESTemplateService {
             await this.sesClient.send(command);
         } catch (error) {
             console.error('Error deleting template:', error);
+            throw error;
+        }
+    }
+
+    async sendTemplatedEmail(params: {
+        source: string;
+        toAddresses: string[];
+        templateName: string;
+        templateData: Record<string, any>;
+        replyToAddresses?: string[];
+        ccAddresses?: string[];
+        bccAddresses?: string[];
+    }): Promise<void> {
+        try {
+            const command = new SendTemplatedEmailCommand({
+                Source: params.source,
+                Destination: {
+                    ToAddresses: params.toAddresses,
+                    CcAddresses: params.ccAddresses,
+                    BccAddresses: params.bccAddresses
+                },
+                Template: params.templateName,
+                TemplateData: JSON.stringify(params.templateData),
+                ReplyToAddresses: params.replyToAddresses
+            });
+            await this.sesClient.send(command);
+        } catch (error) {
+            console.error('Error sending templated email:', error);
             throw error;
         }
     }
