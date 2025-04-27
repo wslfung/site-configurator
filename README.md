@@ -48,8 +48,6 @@ This tool is still very much work in progress.
 
 - Need app icon
 - Tests, need to create some tests for the project.
-- Platform testing.  Need to find an alternative to system encryption for Chromebook and possibly linux.  Can't really store secret keys in plain text.
-- need to work on that background image scaling, it's not working right
 - need to clean up some console logging and better dialog integration with electron
 - Responsive for smaller screens, not a high priority as a desktop app, will would like to add it at some point
 - Leverage more of tailwind or at least more shareable CSS.  This project was done in 3 days, so there was more inline css than I'd hoped.
@@ -61,7 +59,6 @@ This tool is still very much work in progress.
 
 ### AWS SES Template Management
 
-- Decide whether to use redux for it or not.  I'm not a big fan, although it does save me some headaches for the Lambda side.
 - Need to sanitize the HTML input
 - Need to add support for html file upload instead of a big text field
         
