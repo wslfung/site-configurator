@@ -124,12 +124,12 @@ export default function SESPage() {
             if (data.Operation === 'create') {
               console.log('Creating template:', data);
                 await dispatch(createTemplate({ region: data.SelectedRegion, template: data })).unwrap();
+                await dispatch(resetAll());
                 await window.electronAPI?.openMessageDialog("Template created successfully", 'Create SES Template', [], 'info');
-                electronRouter.navigate('/');
             } else if (data.Operation === 'update') {
                 await dispatch(updateTemplate({ region: data.SelectedRegion, template: data })).unwrap();
+                await dispatch(resetAll());
                 await window.electronAPI?.openMessageDialog("Template updated successfully", 'Update SES Template', [], 'info');
-                electronRouter.navigate('/');
             } else {
                 await window.electronAPI?.openMessageDialog("Failed to save template: No credentials available", 'Save SES Template', [], 'error');
             }
@@ -142,8 +142,8 @@ export default function SESPage() {
         if (selectedTemplate && isSelected(selectedTemplate.TemplateName)) {
             try {
                 await dispatch(deleteTemplate({ region: selectedRegion, templateName: selectedTemplate.TemplateName })).unwrap();
+                await dispatch(resetAll());
                 await window.electronAPI?.openMessageDialog("Template deleted successfully", 'Delete SES Template', [], 'info');
-                electronRouter.navigate('/');
             } catch (err) {
                 await window.electronAPI?.openMessageDialog("Failed to delete template", 'Delete SES Template', [], 'error');
             }
