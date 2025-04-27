@@ -108,7 +108,12 @@ export default function LambdaPage() {
                 </Snackbar>
                 <Box className="img-background" sx={{ backgroundImage: `url("./aws-lambda.svg")` }} />
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', mb: 4 }}>
-                    <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
+                    <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => {
+                      dispatch(resetEB());
+                      dispatch(resetLambda());
+                      dispatch(resetCodeArtifact());
+                      electronRouter.navigate('/')
+                    }}>
                         <ArrowBackIcon />
                     </IconButton>
                     <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>

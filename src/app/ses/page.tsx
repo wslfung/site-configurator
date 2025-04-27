@@ -5,17 +5,29 @@ import ClearIcon from '@mui/icons-material/Clear'
 import AddIcon from '@mui/icons-material/Add'
 import SaveIcon from '@mui/icons-material/Save'
 import DeleteIcon from '@mui/icons-material/Delete'
+import SendIcon from '@mui/icons-material/Send'
 import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import { usePageTitle } from '@/hooks/usePageTitle';
 import { useAWSCredentials } from '@/hooks/useAWSCredentials';
 import { Container, Box, Typography } from '@mui/material';
 import { useState, useEffect } from 'react';
-import { SESTemplateService } from '@/services/sesService';
 import { useForm, Controller } from 'react-hook-form';
 import { useElectronRouter } from '@/hooks/useElectronRouter';
 import { SESTemplate } from '@/types/sesTemplate';
 import { regions } from '@/utils/regions';
 import { isSelected } from '@/utils/tools';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/store/reduxStore';
+import {
+    listTemplates,
+    getTemplate,
+    createTemplate,
+    updateTemplate,
+    deleteTemplate,
+    setSelectedTemplate,
+    setSelectedRegion,
+    resetAll // import the new action
+} from '@/store/sesTemplateFormSlice';
 
 interface SESFormData extends SESTemplate {
     SelectedRegion: string;
@@ -26,11 +38,10 @@ export default function SESPage() {
     const electronRouter = useElectronRouter();
     const [isAWSCredentialAvailable, setIsAWSCredentialAvailable] = useState(true);
     const { credentials, isLoading, error } = useAWSCredentials();
-    const [templateNames, setTemplateNames] = useState<string[]>([]);
     const { control, getValues, setValue, resetField, watch, handleSubmit, formState: { errors }, reset } = useForm<SESFormData>({
         defaultValues: {
             SelectedRegion: 'none',
-            SelectedTemplate: 'none',
+            SelectedTemplate: '',
             Operation: 'update',
             TemplateName: '',
             SubjectPart: '',
@@ -39,70 +50,15 @@ export default function SESPage() {
         }
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const selectedRegion = watch('SelectedRegion');
-    const selectedTemplate = watch('SelectedTemplate');
-    const operation = watch('Operation');
-
-    const loadTemplates = async (region: string) => {
-        if (!error && credentials) {
-            try {
-                const service = new SESTemplateService(region, credentials);
-                const templates = await service.listTemplates();
-                setTemplateNames(templates);
-                resetField('SelectedTemplate');
-            } catch (err) {
-                console.error('Failed to load templates:', err);
-            }
-        } else if (error) {
-            console.error('Failed to load AWS credentials:', error);
-        }
-    };
-
-    const getTemplate = async (region: string, templateName: string) => {
-        if (!error && credentials) {
-            try {
-                const service = new SESTemplateService(region, credentials);
-                const template = await service.getTemplate(templateName);
-                setValue('TemplateName', template.TemplateName);
-                setValue('SubjectPart', template.SubjectPart);
-                setValue('TextPart', template.TextPart);
-                setValue('HtmlPart', template.HtmlPart);
-                console.log(template);
-            } catch (err) {
-                console.error('Failed to get template:', err);
-            }
-        } else if (error) {
-            console.error('Failed to load AWS credentials:', error);
-        }
-    };
-
-    const handleSave = async (data: SESFormData) => {
-        if (data.Operation === 'create' && credentials) {
-            const service = new SESTemplateService(data.SelectedRegion, credentials);
-            await service.createTemplate(data);
-            await window.electronAPI?.openMessageDialog("Template created successfully", 'Create SES Template', [], 'info')
-            electronRouter.navigate('/');
-        } else if (data.Operation === 'update' && credentials) {
-            const service = new SESTemplateService(data.SelectedRegion, credentials);
-            await service.updateTemplate(data);
-            await window.electronAPI?.openMessageDialog("Template updated successfully", 'Update SES Template', [], 'info')
-            electronRouter.navigate('/');
-        } else {
-            await window.electronAPI?.openMessageDialog("Failed to save template: No credentials available", 'Save SES Template', [], 'error')
-        }
-    }
-
-    const handleDelete = async () => {
-        if (credentials && isSelected(selectedTemplate)) {
-            const service = new SESTemplateService(selectedRegion, credentials);
-            await service.deleteTemplate(selectedTemplate);
-            await window.electronAPI?.openMessageDialog("Template deleted successfully", 'Delete SES Template', [], 'info')
-            electronRouter.navigate('/');
-        } else if (error) {
-            console.error('Failed to load AWS credentials:', error);
-            await window.electronAPI?.openMessageDialog("Failed to delete template: No credentials available", 'Delete SES Template', [], 'error')
-        }
-    }
+    const operation = watch('Operation'); // FIX: get operation from form state
+    const dispatch = useDispatch<AppDispatch>();
+    const {
+        templates: templateNames,
+        selectedTemplate,
+        selectedRegion, // get from redux
+        loading,
+        error: sesError
+    } = useSelector((state: RootState) => state.sesTemplateForm);
 
     const theme = useTheme();
     usePageTitle('SES Email Templates');
@@ -116,23 +72,86 @@ export default function SESPage() {
     }, [isLoading, credentials])
 
     // Watch for region changes and credentials loading state
+    // useEffect(() => {
+    //     if (isSelected(selectedRegion)) {
+    //         dispatch(listTemplates({ region: selectedRegion }));
+    //         dispatch(setSelectedTemplate(null));
+    //         resetField('SelectedTemplate');
+    //     }
+    // }, [selectedRegion]);
+
     useEffect(() => {
-        if (!isLoading && isSelected(selectedRegion)) {
-            loadTemplates(selectedRegion);
+        if (selectedTemplate) {
+            setValue('TemplateName', selectedTemplate.TemplateName);
+            setValue('SubjectPart', selectedTemplate.SubjectPart);
+            setValue('TextPart', selectedTemplate.TextPart);
+            setValue('HtmlPart', selectedTemplate.HtmlPart);
         }
-    }, [isLoading, selectedRegion]);
-    // Watch for template changes
-    useEffect(() => {
-        if (!isLoading && isSelected(selectedTemplate)) {
-            getTemplate(selectedRegion, selectedTemplate)
-        }
-        if (!isLoading && !isSelected(selectedTemplate)) {
+    }, [selectedTemplate]);
+
+    const handleSelectRegion = (region: string) => {
+      if (isSelected(region)) {
+        console.log("Selected region:", region);
+        setValue('SelectedRegion', region);
+        dispatch(setSelectedRegion(region));
+        dispatch(listTemplates({ region }));
+        dispatch(setSelectedTemplate(null));
+        resetField('SelectedTemplate');
+      }
+    }
+
+    const handleSelectTemplate = (templateName: string | null) => {
+        console.log('Selected template:', templateName);
+
+        if (!templateName) {
+          console.log('No template selected');
+            dispatch(setSelectedTemplate(null));
+            resetField('SelectedTemplate');
             resetField('TemplateName');
             resetField('SubjectPart');
             resetField('TextPart');
             resetField('HtmlPart');
+            return;
+        } else {
+            console.log('Fetching template:', templateName);
+            dispatch(getTemplate({ region: selectedRegion, templateName }));
         }
-    }, [isLoading, selectedTemplate]);
+        setValue('SelectedTemplate', templateName);
+    }
+
+    const handleSave = async (data: SESFormData) => {
+        try {
+            if (data.Operation === 'create') {
+              console.log('Creating template:', data);
+                await dispatch(createTemplate({ region: data.SelectedRegion, template: data })).unwrap();
+                await window.electronAPI?.openMessageDialog("Template created successfully", 'Create SES Template', [], 'info');
+                electronRouter.navigate('/');
+            } else if (data.Operation === 'update') {
+                await dispatch(updateTemplate({ region: data.SelectedRegion, template: data })).unwrap();
+                await window.electronAPI?.openMessageDialog("Template updated successfully", 'Update SES Template', [], 'info');
+                electronRouter.navigate('/');
+            } else {
+                await window.electronAPI?.openMessageDialog("Failed to save template: No credentials available", 'Save SES Template', [], 'error');
+            }
+        } catch (err) {
+            await window.electronAPI?.openMessageDialog("Failed to save template", 'Save SES Template', [], 'error');
+        }
+    };
+
+    const handleDelete = async () => {
+        if (selectedTemplate && isSelected(selectedTemplate.TemplateName)) {
+            try {
+                await dispatch(deleteTemplate({ region: selectedRegion, templateName: selectedTemplate.TemplateName })).unwrap();
+                await window.electronAPI?.openMessageDialog("Template deleted successfully", 'Delete SES Template', [], 'info');
+                electronRouter.navigate('/');
+            } catch (err) {
+                await window.electronAPI?.openMessageDialog("Failed to delete template", 'Delete SES Template', [], 'error');
+            }
+        } else if (error) {
+            await window.electronAPI?.openMessageDialog("Failed to delete template: No credentials available", 'Delete SES Template', [], 'error');
+        }
+    };
+
     return (
         <>
             <Container maxWidth="lg" sx={{ mt: 4 }}>
@@ -144,11 +163,15 @@ export default function SESPage() {
                     <Alert severity="error" sx={{ width: '100%' }}>
                         Please configure AWS credentials first.  Go to <Button variant="text" onClick={() => electronRouter.navigate('/settings')}>Settings</Button> to configure.
                     </Alert>
-                </Snackbar>                
-                <Box className="img-background" sx={{backgroundImage: `url("./aws-ses.svg")`}} />
+                </Snackbar>
+                <Box className="img-background" sx={{ backgroundImage: `url("./aws-ses.svg")` }} />
                 <Box sx={{ display: 'block', minHeight: '70vh', opacity: 0.9, zIndex: 1 }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start' }}>
-                        <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => electronRouter.navigate('/')}>
+                        <IconButton sx={{ float: 'left', mr: 2 }} onClick={() => 
+                          {
+                            dispatch(resetAll());
+                            electronRouter.navigate('/')
+                          }}>
                             <ArrowBackIcon />
                         </IconButton>
                         <Typography variant="h6" gutterBottom sx={{ mt: 1 }}>
@@ -171,7 +194,7 @@ export default function SESPage() {
                                 <InputLabel>Region</InputLabel>
                                 <Select
                                     value={selectedRegion}
-                                    onChange={(e) => setValue('SelectedRegion', e.target.value)}
+                                    onChange={(e) => handleSelectRegion(e.target.value)}
                                     label="Region"
                                     sx={{ width: '100%' }}
                                     MenuProps={{ PaperProps: { sx: { maxHeight: 300 } } }}
@@ -195,7 +218,11 @@ export default function SESPage() {
                                             {...field}
                                             sx={{ mr: 2, flexGrow: 1 }}
                                             options={templateNames}
-                                            onChange={(event, newValue) => field.onChange(newValue)}
+                                            value={selectedTemplate ? selectedTemplate.TemplateName : null}
+                                            onChange={(event, newValue) => { 
+                                              console.log('Selected template:', newValue);
+                                              return handleSelectTemplate(newValue)
+                                             }}
                                             renderInput={(params) => (
                                                 <TextField
                                                     {...params}
@@ -214,13 +241,14 @@ export default function SESPage() {
                             {getValues('SelectedTemplate') && (
                                 <></>
                             )}
-                            <Box sx={{ float: 'right', ml: 2 }}>
-                                {isSelected(selectedRegion) && !isSelected(selectedTemplate) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setValue('Operation', 'create'); resetField('SelectedTemplate') }} sx={{}}>New</Button>)}
-                                {isSelected(selectedRegion) && isSelected(selectedTemplate) && (<Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={(e) => { e.preventDefault(); handleDelete(); }}>Delete</Button>)}
+                            <Box sx={{ float: 'right', ml: 2}}>
+                                {isSelected(selectedRegion) && !isSelected(selectedTemplate? selectedTemplate.TemplateName:null) && operation === 'update' && (<Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => { setValue('Operation', 'create'); resetField('SelectedTemplate') }} sx={{}}>New</Button>)}
+                                {isSelected(selectedRegion) && isSelected(selectedTemplate? selectedTemplate.TemplateName: null) && (<Button variant="contained" color="error" startIcon={<DeleteIcon />} onClick={(e) => { e.preventDefault(); handleDelete(); }}>Delete</Button>)}
+                                {isSelected(selectedRegion) && isSelected(selectedTemplate? selectedTemplate.TemplateName: null) && (<Button variant="contained" sx={{ml: 2}} color="primary" startIcon={<SendIcon />} onClick={(e) => { e.preventDefault(); electronRouter.navigate('/ses-send'); }}>Send with Template</Button>)}
                             </Box>
                         </Box>
                         {((isSelected(selectedRegion) && operation === 'create') ||
-                            (isSelected(selectedRegion) && operation === 'update' && isSelected(selectedTemplate))) &&
+                            (isSelected(selectedRegion) && operation === 'update' && isSelected(selectedTemplate ? selectedTemplate.TemplateName : null))) &&
                             (
                                 <Box id="template-form-fields">
                                     {operation === 'create' && (
@@ -246,7 +274,7 @@ export default function SESPage() {
                                         control={control}
                                         rules={{ required: 'Text is required' }}
                                         render={({ field }) => (
-                                            <TextField fullWidth label="Text" multiline rows={4} {...field} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
+                                            <TextField fullWidth label="Text" {...field} multiline rows={4} sx={{ mb: 2 }} error={!!errors.TextPart} helperText={errors.TextPart?.message} />
                                         )}
                                     />
                                     <Controller
