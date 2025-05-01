@@ -24,7 +24,7 @@ export default function LambdaPage() {
     const { credentials, isLoading } = useAWSCredentials();
     const electronRouter = useElectronRouter();
     const dispatch = useDispatch<AppDispatch>();
-    const { format, namespace } = useSelector((state: RootState) => state.codeArtifactForm);
+    const { format, namespace, region } = useSelector((state: RootState) => state.codeArtifactForm);
     const { deployResult } = useSelector((state: RootState) => state.eventBridgeForm);
     const { control, getValues, setValue, resetField, watch, handleSubmit, formState: { errors }, reset } = useForm<LambdaDeployFormData>({
         defaultValues: {
@@ -59,7 +59,7 @@ export default function LambdaPage() {
 
     const handleLambdaDeployment = (data: LambdaDeployFormData) => {
         dispatch(requestDeployment({
-            region: data.region,
+            region: region,
             domain: data.domain,
             repository: data.repository,
             packageName: data.packageName,
@@ -77,10 +77,10 @@ export default function LambdaPage() {
     useEffect(() => {
         if (deployResult) {
             window.electronAPI?.openMessageDialog('Lambda deployment requested successfully', 'Success', ['OK'], 'info');
-            dispatch(resetLambda());
-            dispatch(resetEB());
-            dispatch(resetCodeArtifact());
-            window.electronAPI?.loadPage('/');
+            // dispatch(resetLambda());
+            // dispatch(resetEB());
+            // dispatch(resetCodeArtifact());
+            // window.electronAPI?.loadPage('/');
         }
     }, [deployResult]);
 

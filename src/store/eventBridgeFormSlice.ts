@@ -51,13 +51,14 @@ export const requestDeployment = createAsyncThunk<
         throw new Error('No credentials available');
       }
       const service = new EventBridgeService(region, credentials);
-      await service.putEventToEventBridge(ebBus, ebSource, 'LambdaDeploy From CodeArtifact', {
-                    domainName:domain, 
+      await service.putEventToEventBridge(ebBus, ebSource, detailType, {
+                    domainName: domain, 
                     domainOwner: credentials.accountId, 
                     repositoryName: repository, 
                     packageName, 
                     packageNamespace: namespace, 
-                    packageFormat:format, 
+                    packageFormat: format,
+                    packageVersionState: 'Redeploy',
                     packageVersion: version, 
                     lambdaRegion,
                     lambdaFunctionName
