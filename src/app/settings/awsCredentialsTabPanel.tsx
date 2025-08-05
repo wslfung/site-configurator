@@ -101,7 +101,7 @@ export default function AWSCredentialsTabPanel(props: TabPanelProps) {
                                 {...register('secretKey', {
                                     required: 'Secret Key is required',
                                     pattern: {
-                                        value: /^[a-zA-Z0-9]+$/,
+                                        value: /^[a-zA-Z0-9\/]+$/,
                                         message: 'Secret Key must be alphanumeric'
                                     }
                                 })}
